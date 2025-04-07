@@ -171,6 +171,8 @@ const ProfilePage = () => {
                   <div className="stat-value text-lg">{user?.name}</div>
                 </div>
 
+                {/* // TODO: Username */}
+
                 <div className="stat">
                   <div className="stat-title">Email</div>
                   <div className="stat-value text-lg">{user?.email}</div>

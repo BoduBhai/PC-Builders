@@ -85,8 +85,8 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
         const user = await User.findOne({ email });
+
         if (user && (await user.comparePassword(password))) {
             //generate token
             const { accessToken, refreshToken } = generateToken(user._id);
@@ -103,7 +103,7 @@ export const login = async (req, res) => {
                 role: user.role,
             });
         } else {
-            res.status(401).json({ message: "Invalid credentials" });
+            res.status(400).json({ message: "Invalid credentials" });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -199,7 +199,7 @@ export const changePassword = async (req, res) => {
 
         if (!(await user.comparePassword(currentPassword))) {
             return res
-                .status(401)
+                .status(400)
                 .json({ message: "Current password is incorrect" });
         }
 

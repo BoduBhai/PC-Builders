@@ -42,13 +42,10 @@ export const useUserStore = create((set, get) => ({
   },
 
   logout: async () => {
-    set({ loading: true });
-
     try {
       await axios.post("/auth/logout");
       set({ user: null, loading: false });
     } catch (error) {
-      set({ loading: false });
       toast.error(error.response.data.message || "Something went wrong!");
     }
   },
@@ -61,7 +58,7 @@ export const useUserStore = create((set, get) => ({
       set({ user: res.data, checkingAuth: false });
     } catch (error) {
       set({ user: null, checkingAuth: false });
-      console.log("Error checking auth:", error);
+      console.log("Error checking auth:", error.message);
     }
   },
 

@@ -36,12 +36,20 @@ function App() {
         />
         <Route
           path="/profile"
-          element={user ? <ProfilePage /> : <Navigate to="/" />}
+          element={user ? <ProfilePage /> : <Navigate to="/login" />}
         />
 
         {/* Admin */}
-        {/* // TODO: Add a protected route for admin dashboard */}
-        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route
+          path="/dashboard"
+          element={
+            user && user?.role === "admin" ? (
+              <AdminDashboard />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
       </Routes>
       <Toaster />
     </div>
