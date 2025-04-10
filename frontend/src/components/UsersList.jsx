@@ -24,7 +24,6 @@ const UsersList = () => {
       try {
         await toggleRole(roleChangeUserId);
         const user = users.find((user) => user._id === roleChangeUserId);
-        console.log("user", user);
         toast.success(
           user.role === "admin"
             ? `${user.fname} is changed to a Customer`
