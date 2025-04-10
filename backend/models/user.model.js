@@ -3,9 +3,12 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
     {
-        name: {
+        fname: {
             type: String,
             required: [true, "Name is required"],
+        },
+        lname: {
+            type: String,
         },
         email: {
             type: String,
@@ -55,7 +58,7 @@ const userSchema = new mongoose.Schema(
         ],
         role: {
             type: String,
-            enum: ["customer", "admin"],
+            enum: ["customer", "admin", "superadmin"],
             default: "customer",
         },
     },

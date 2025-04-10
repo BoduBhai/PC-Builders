@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
 import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
@@ -47,7 +46,7 @@ const setCookies = (res, accessToken, refreshToken) => {
 };
 
 export const signup = async (req, res) => {
-    const { email, name, password, phone } = req.body;
+    const { email, fname, lname, password, phone } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -57,7 +56,8 @@ export const signup = async (req, res) => {
 
         const user = await User.create({
             email,
-            name,
+            fname,
+            lname,
             password,
             phone,
         });
@@ -71,7 +71,8 @@ export const signup = async (req, res) => {
         res.status(201).json({
             _id: user._id,
             email: user.email,
-            name: user.name,
+            fname: user.fname,
+            lname: user.lname,
             phone: user.phone,
             profilePicture: user.profilePicture,
             address: user.address,
@@ -96,7 +97,8 @@ export const login = async (req, res) => {
             res.status(200).json({
                 _id: user._id,
                 email: user.email,
-                name: user.name,
+                fname: user.fname,
+                lname: user.lname,
                 phone: user.phone,
                 profilePicture: user.profilePicture,
                 address: user.address,

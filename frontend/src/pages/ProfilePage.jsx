@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useUserStore } from "../stores/useUserStore";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { formatDate } from "../utils/dateUtils";
 
 const ProfilePage = () => {
   const { user, loading, updateUserProfile, changePassword } = useUserStore();
@@ -16,7 +17,8 @@ const ProfilePage = () => {
 
   const handleEditClick = () => {
     setEditFormData({
-      name: user?.name || "",
+      fname: user?.fname || "",
+      lname: user?.lname || "",
       phone: user?.phone || "",
       address: user?.address || "",
       profilePicture: user?.profilePicture || null,
@@ -55,8 +57,8 @@ const ProfilePage = () => {
     try {
       toast.loading("Updating profile...", { id: "profileUpdate" });
       await updateUserProfile(editFormData);
-      toast.success("Profile updated successfully", { id: "profileUpdate" });
       document.getElementById("edit_profile_modal").close();
+      toast.success("Profile updated successfully", { id: "profileUpdate" });
     } catch (error) {
       const errorMsg =
         error?.response?.data?.message || "Failed to update profile";
@@ -112,7 +114,11 @@ const ProfilePage = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-primary mb-8 text-center text-3xl font-bold">
         Welcome,{" "}
-        {user?.role === "admin" ? `Admin ${user?.name}` : `${user?.name}`}
+        {user?.role === "superadmin"
+          ? `Master ${user?.fname}`
+          : user?.role === "admin"
+            ? `Admin ${user?.fname}`
+            : `${user?.fname}`}
       </h1>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -121,14 +127,11 @@ const ProfilePage = () => {
           <figure className="px-10 pt-10">
             <div className="avatar">
               <div className="w-32 rounded-full">
-                <img src={avatarUrl} alt={user?.name || "User"} />
+                <img src={avatarUrl} alt={user?.fname || "User"} />
               </div>
             </div>
           </figure>
           <div className="card-body items-center text-center">
-            <h2 className="card-title text-2xl">{user?.name}</h2>
-
-            {/* <div className="card-actions mt-4 justify-center"></div> */}
             <button className="btn btn-primary w-42" onClick={handleEditClick}>
               Edit Profile
             </button>
@@ -143,7 +146,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* User Information */}
+        {/* Personal Information */}
         <div className="lg:col-span-2">
           <div className="card bg-base-100 mb-8 shadow-xl">
             <div className="card-body">
@@ -168,7 +171,9 @@ const ProfilePage = () => {
               <div className="stats stats-vertical lg:stats-horizontal shadow">
                 <div className="stat">
                   <div className="stat-title">Full Name</div>
-                  <div className="stat-value text-lg">{user?.name}</div>
+                  <div className="stat-value text-lg">
+                    {user?.fname} {user?.lname}
+                  </div>
                 </div>
 
                 {/* // TODO: Username */}
@@ -287,9 +292,7 @@ const ProfilePage = () => {
                       Member Since
                     </h3>
                     <p>
-                      {user?.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString()
-                        : "N/A"}
+                      {user?.createdAt ? formatDate(user.createdAt) : "N/A"}
                     </p>
                   </div>
                 </div>
@@ -313,7 +316,7 @@ const ProfilePage = () => {
                 <div className="w-32 rounded-full">
                   <img
                     src={editFormData.profilePicture || avatarUrl}
-                    alt={user?.name || "User"}
+                    alt={user?.fname || "User"}
                   />
                 </div>
               </div>
@@ -333,19 +336,35 @@ const ProfilePage = () => {
             </div>
 
             {/* Name */}
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">Full Name</span>
-              </div>
-              <input
-                type="text"
-                name="name"
-                placeholder="Your name"
-                className="input input-bordered w-full"
-                value={editFormData.name || ""}
-                onChange={handleEditChange}
-              />
-            </label>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <label className="form-control w-full">
+                <div className="label">
+                  <span className="label-text">First Name</span>
+                </div>
+                <input
+                  type="text"
+                  name="fname"
+                  placeholder="Your first name"
+                  className="input input-bordered w-full"
+                  value={editFormData.fname || ""}
+                  onChange={handleEditChange}
+                />
+              </label>
+              <label className="form-control w-full">
+                <div className="label">
+                  <span className="label-text">Last Name</span>
+                </div>
+                <input
+                  type="text"
+                  name="lname"
+                  placeholder="Your last name"
+                  className="input input-bordered w-full"
+                  value={editFormData.lname || ""}
+                  onChange={handleEditChange}
+                />
+              </label>
+            </div>
 
             {/* Phone */}
             <label className="form-control w-full">
@@ -355,7 +374,9 @@ const ProfilePage = () => {
               <input
                 type="tel"
                 name="phone"
-                placeholder="Your phone number"
+                placeholder="01X XXXXXXX"
+                pattern="[0-9]{10,11}"
+                maxLength={11}
                 className="input input-bordered w-full"
                 value={editFormData.phone || ""}
                 onChange={handleEditChange}

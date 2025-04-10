@@ -5,6 +5,7 @@ import CreateProductForm from "../../components/CreateProductForm";
 import ProductsList from "../../components/ProductsList";
 import UsersList from "../../components/UsersList";
 import { useProductStore } from "../../stores/useProductStore";
+import { useAdminStore } from "../../stores/useAdminStore";
 
 const tabs = [
   {
@@ -27,11 +28,13 @@ const tabs = [
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("create");
 
+  const { getAllUsers } = useAdminStore();
   const { fetchProducts } = useProductStore();
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    getAllUsers();
+  }, [fetchProducts, getAllUsers]);
 
   return (
     <div className="min-h-screen">

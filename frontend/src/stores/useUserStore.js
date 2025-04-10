@@ -7,7 +7,7 @@ export const useUserStore = create((set, get) => ({
   loading: false,
   checkingAuth: true,
 
-  signup: async ({ name, email, password, confirmPassword, phone }) => {
+  signup: async ({ fname, lname, email, password, confirmPassword, phone }) => {
     set({ loading: true });
 
     if (password !== confirmPassword) {
@@ -17,7 +17,8 @@ export const useUserStore = create((set, get) => ({
 
     try {
       const res = await axios.post("/auth/signup", {
-        name,
+        fname,
+        lname,
         email,
         password,
         phone,

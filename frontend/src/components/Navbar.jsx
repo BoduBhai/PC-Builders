@@ -7,7 +7,7 @@ import { useUserStore } from "../stores/useUserStore";
 const Navbar = () => {
   const { user, logout } = useUserStore();
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
 
   return (
     <header className="navbar bg-base-100 gap-3 py-5 shadow-sm">

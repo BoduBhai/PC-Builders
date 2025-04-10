@@ -43,13 +43,16 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            user && user?.role === "admin" ? (
+            user && (user?.role === "admin" || user?.role === "superadmin") ? (
               <AdminDashboard />
             ) : (
               <Navigate to="/" />
             )
           }
         />
+
+        {/* Redirect all other paths to home */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <Toaster />
     </div>
