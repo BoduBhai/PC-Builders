@@ -100,7 +100,6 @@ export const deleteUser = async (req, res) => {
                 .split(".")[0];
             try {
                 await cloudinary.uploader.destroy(`users/${publicId}`);
-                console.log("Image deleted from Cloudinary successfully");
             } catch (error) {
                 console.error(
                     "Error deleting image from Cloudinary:",

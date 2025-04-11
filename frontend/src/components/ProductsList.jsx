@@ -1,6 +1,7 @@
 import { Trash } from "lucide-react";
 import { useProductStore } from "../stores/useProductStore";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 import {
   categoryOptions,
@@ -9,10 +10,16 @@ import {
 } from "../utils/constants";
 
 const ProductsList = () => {
-  const { products, toggleProductDiscount, updateProduct, deleteProduct } =
-    useProductStore();
+  const {
+    products,
+    toggleProductDiscount,
+    updateProduct,
+    deleteProduct,
+    loading,
+  } = useProductStore();
 
   const [editFormData, setEditFormData] = useState({});
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const handleEditClick = (product) => {
     // Initialize form with current product data
@@ -34,6 +41,56 @@ const ProductsList = () => {
       ...editFormData,
       [name]: name === "price" || name === "stock" ? Number(value) : value,
     });
+  };
+
+  // Handle discount toggle with toast notification
+  const handleDiscountToggle = async (product, discountData) => {
+    try {
+      if (!product.onDiscount) {
+        await toggleProductDiscount(product._id, discountData);
+      } else {
+        await toggleProductDiscount(product._id);
+      }
+      document.getElementById(`discount_modal_${product._id}`).close();
+    } catch (error) {
+      const errorMsg =
+        error?.response?.data?.message || "Failed to update discount";
+      toast.error(errorMsg);
+      console.error("Discount update error:", error);
+    }
+  };
+
+  // Handle product update with toast notification
+  const handleProductUpdate = async (productId) => {
+    try {
+      await updateProduct(productId, editFormData);
+      document.getElementById(`edit_modal_${productId}`).close();
+    } catch (error) {
+      const errorMsg =
+        error?.response?.data?.message || "Failed to update product";
+      toast.error(errorMsg);
+      console.error("Product update error:", error);
+    }
+  };
+
+  // Show delete confirmation modal
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    document.getElementById("delete_product_modal").showModal();
+  };
+
+  // Handle product deletion
+  const confirmProductDelete = async () => {
+    try {
+      await deleteProduct(productToDelete?._id);
+      document.getElementById("delete_product_modal").close();
+      setProductToDelete(null);
+    } catch (error) {
+      const errorMsg =
+        error?.response?.data?.message || "Failed to delete product";
+      toast.error(errorMsg);
+      console.error("Product deletion error:", error);
+    }
   };
 
   return (
@@ -99,7 +156,7 @@ const ProductsList = () => {
                   </button>
                   <button
                     className="cursor-pointer text-red-500 hover:text-red-700"
-                    onClick={() => deleteProduct(product?._id)}
+                    onClick={() => handleDeleteClick(product)}
                   >
                     <Trash className="size-5" />
                   </button>
@@ -194,32 +251,36 @@ const ProductsList = () => {
               <div className="modal-action">
                 <form method="dialog">
                   <button className="btn btn-outline mr-2">Cancel</button>
-                  <button
-                    className="btn btn-success"
-                    onClick={() => {
-                      if (!product?.onDiscount) {
-                        const discountPrice = document.getElementById(
-                          `discount-price-${product._id}`,
-                        ).value;
-                        const startDate = document.getElementById(
-                          `discount-start-${product._id}`,
-                        ).value;
-                        const endDate = document.getElementById(
-                          `discount-end-${product._id}`,
-                        ).value;
+                  {loading ? (
+                    <span className="loading loading-spinner loading-xl text-success" />
+                  ) : (
+                    <button
+                      className="btn btn-success"
+                      onClick={() => {
+                        if (!product?.onDiscount) {
+                          const discountPrice = document.getElementById(
+                            `discount-price-${product._id}`,
+                          ).value;
+                          const startDate = document.getElementById(
+                            `discount-start-${product._id}`,
+                          ).value;
+                          const endDate = document.getElementById(
+                            `discount-end-${product._id}`,
+                          ).value;
 
-                        toggleProductDiscount(product?._id, {
-                          discountPrice,
-                          discountStartDate: startDate,
-                          discountEndDate: endDate,
-                        });
-                      } else {
-                        toggleProductDiscount(product?._id);
-                      }
-                    }}
-                  >
-                    {product?.onDiscount ? "Remove" : "Apply"} Discount
-                  </button>
+                          handleDiscountToggle(product, {
+                            discountPrice,
+                            discountStartDate: startDate,
+                            discountEndDate: endDate,
+                          });
+                        } else {
+                          handleDiscountToggle(product);
+                        }
+                      }}
+                    >
+                      {product?.onDiscount ? "Remove" : "Apply"} Discount
+                    </button>
+                  )}
                 </form>
               </div>
             </div>
@@ -384,18 +445,53 @@ const ProductsList = () => {
               <div className="modal-action">
                 <form method="dialog">
                   <button className="btn btn-outline mr-2">Cancel</button>
-                  <button
-                    className="btn btn-success"
-                    onClick={() => updateProduct(product._id, editFormData)}
-                  >
-                    Save Changes
-                  </button>
+
+                  {loading ? (
+                    <span className="loading loading-spinner loading-xl text-success" />
+                  ) : (
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleProductUpdate(product._id)}
+                    >
+                      Save Changes
+                    </button>
+                  )}
                 </form>
               </div>
             </div>
           </dialog>
         </div>
       ))}
+
+      {/* Delete Product Confirmation Modal */}
+      <dialog
+        id="delete_product_modal"
+        className="modal modal-bottom sm:modal-middle"
+      >
+        <div className="modal-box">
+          <h3 className="text-error text-lg font-bold">Confirm Deletion</h3>
+          <p className="py-4">
+            Are you sure you want to delete{" "}
+            <strong>{productToDelete?.modelNo}</strong>? This action cannot be
+            undone.
+          </p>
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn btn-outline mr-2">Cancel</button>
+              {loading ? (
+                <span className="loading loading-spinner loading-xl text-error" />
+              ) : (
+                <button
+                  className="btn btn-error"
+                  onClick={confirmProductDelete}
+                >
+                  Delete Product
+                </button>
+              )}
+            </form>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 };

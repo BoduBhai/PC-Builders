@@ -22,9 +22,10 @@ export const useProductStore = create((set) => ({
       toast.success("Product created successfully!", {
         id: "create-product",
       });
+      return res.data;
     } catch (error) {
       set({ loading: false });
-      console.error("Error creating useProductStore:", error);
+      console.error("Error creating product:", error);
       toast.error(
         error?.response?.data?.message ||
           "Failed to create product. Please try again.",
@@ -32,6 +33,7 @@ export const useProductStore = create((set) => ({
           id: "create-product",
         },
       );
+      throw error;
     }
   },
 
@@ -40,10 +42,12 @@ export const useProductStore = create((set) => ({
     try {
       const res = await axios.get("/products");
       set({ products: res.data.products, loading: false });
+      return res.data.products;
     } catch (error) {
       console.error("Error fetching products:", error);
       toast.error("Failed to fetch products. Try logging in again.");
       set({ error: "Failed to fetch products", loading: false });
+      throw error;
     }
   },
 
@@ -63,6 +67,7 @@ export const useProductStore = create((set) => ({
       toast.success("Product updated successfully!", {
         id: "update-product",
       });
+      return res.data;
     } catch (error) {
       set({ loading: false });
       console.error("Error updating product:", error);
@@ -73,6 +78,7 @@ export const useProductStore = create((set) => ({
           id: "update-product",
         },
       );
+      throw error;
     }
   },
 
@@ -100,6 +106,7 @@ export const useProductStore = create((set) => ({
           id: "delete-product",
         },
       );
+      throw error;
     }
   },
 
@@ -136,9 +143,10 @@ export const useProductStore = create((set) => ({
       toast.success("Product discount updated successfully!", {
         id: "update-product-discount",
       });
+      return res.data;
     } catch (error) {
-      console.error("Error toggling product discount:", error);
       set({ loading: false });
+      console.error("Error toggling product discount:", error);
       toast.error(
         error?.response?.data?.message ||
           "Failed to update product discount. Please try again.",
@@ -146,6 +154,7 @@ export const useProductStore = create((set) => ({
           id: "update-product-discount",
         },
       );
+      throw error;
     }
   },
 }));
