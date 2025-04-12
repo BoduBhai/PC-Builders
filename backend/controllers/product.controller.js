@@ -12,30 +12,86 @@ export const getAllProducts = async (req, res) => {
     }
 };
 
+export const getSingleProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findById(id);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.error("Error fetching product:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export const getDiscountedProducts = async (req, res) => {
     try {
-        let discountedProducts = await redis.get("discountedProducts");
+        // Check if pagination parameters are provided
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 0; // 0 means no limit (return all)
 
-        if (discountedProducts) {
-            return res.status(200).json(JSON.parse(discountedProducts));
+        // If no pagination is requested, use cached data
+        if (!page || !limit) {
+            let discountedProducts = await redis.get("discountedProducts");
+
+            if (discountedProducts) {
+                return res.status(200).json(JSON.parse(discountedProducts));
+            }
+
+            // If not in cache, fetch from database
+            discountedProducts = await Product.find({
+                onDiscount: true,
+            }).lean();
+
+            if (!discountedProducts || discountedProducts.length === 0) {
+                return res
+                    .status(404)
+                    .json({ message: "No discounted products found" });
+            }
+
+            // Set the cache
+            await redis.set(
+                "discountedProducts",
+                JSON.stringify(discountedProducts)
+            );
+
+            return res.status(200).json(discountedProducts);
         }
 
-        // If not in cache, fetch from database
-        discountedProducts = await Product.find({ onDiscount: true }).lean();
+        // For paginated requests, calculate skip value
+        const skip = (page - 1) * limit;
 
-        if (!discountedProducts) {
-            return res
-                .status(404)
-                .json({ message: "No discounted products found" });
+        // Get total count for pagination metadata
+        const total = await Product.countDocuments({ onDiscount: true });
+
+        // Fetch paginated results
+        const products = await Product.find({ onDiscount: true })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        if (!products || products.length === 0) {
+            return res.status(404).json({
+                message: "No discounted products found for this page",
+                products: [],
+                total: 0,
+                page,
+                limit,
+            });
         }
 
-        // Set the cache
-        await redis.set(
-            "discountedProducts",
-            JSON.stringify(discountedProducts)
-        );
-
-        res.status(200).json(discountedProducts);
+        // Return paginated response
+        res.status(200).json({
+            products,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        });
     } catch (error) {
         console.error("Error fetching discounted products:", error.message);
         res.status(500).json({ message: "Internal server error" });
@@ -184,6 +240,32 @@ export const toggleDiscountedProduct = async (req, res) => {
         }
     } catch (error) {
         console.error("Error toggling discounted product:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const getProductsByCategory = async (req, res) => {
+    try {
+        const { category } = req.params;
+
+        // Use case-insensitive regex match for category
+        const categoryProducts = await Product.find({
+            category: { $regex: new RegExp(`^${category}$`, "i") },
+        }).lean();
+
+        if (!categoryProducts || categoryProducts.length === 0) {
+            return res.status(404).json({
+                message: `No products found in category: ${category}`,
+                products: [],
+            });
+        }
+
+        res.status(200).json({ products: categoryProducts });
+    } catch (error) {
+        console.error(
+            `Error fetching ${req.params.category} products:`,
+            error.message
+        );
         res.status(500).json({ message: "Internal server error" });
     }
 };

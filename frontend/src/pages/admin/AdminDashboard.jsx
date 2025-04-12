@@ -4,10 +4,17 @@ import { useEffect, useState } from "react";
 import CreateProductForm from "../../components/CreateProductForm";
 import ProductsList from "../../components/ProductsList";
 import UsersList from "../../components/UsersList";
+import Analytics from "../../components/Analytics";
 import { useProductStore } from "../../stores/useProductStore";
 import { useAdminStore } from "../../stores/useAdminStore";
+import { useAnalyticsStore } from "../../stores/useAnalyticsStore";
 
 const tabs = [
+  {
+    id: "analytics",
+    label: "Analytics",
+    icon: ShoppingBasket,
+  },
   {
     id: "create",
     label: "Create Product",
@@ -26,15 +33,17 @@ const tabs = [
 ];
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeTab, setActiveTab] = useState("analytics");
 
   const { getAllUsers } = useAdminStore();
   const { fetchProducts } = useProductStore();
+  const { fetchAnalytics } = useAnalyticsStore();
 
   useEffect(() => {
+    fetchAnalytics();
     fetchProducts();
     getAllUsers();
-  }, [fetchProducts, getAllUsers]);
+  }, [fetchAnalytics, fetchProducts, getAllUsers]);
 
   return (
     <div className="min-h-screen">
@@ -60,6 +69,7 @@ const AdminDashboard = () => {
           ))}
         </div>
       </div>
+      {activeTab === "analytics" && <Analytics />}
       {activeTab === "create" && <CreateProductForm />}
       {activeTab === "products" && <ProductsList />}
       {activeTab === "users" && <UsersList />}

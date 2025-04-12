@@ -2,11 +2,61 @@ import { create } from "zustand";
 import { toast } from "react-hot-toast";
 import axios from "../lib/axios";
 
-export const useProductStore = create((set) => ({
+export const useProductStore = create((set, get) => ({
   products: [],
+  discountedProducts: [],
+  similarProducts: [],
   loading: false,
+  discountedProductsPage: 1,
+  discountedProductsTotal: 0,
+  discountedProductsLimit: 9, // Number of items per page
+  currentProduct: null,
 
   setProducts: (products) => set({ products }),
+
+  fetchProductById: async (productId) => {
+    if (!productId) {
+      toast.error("Invalid product ID");
+      return null;
+    }
+
+    set({ loading: true });
+    try {
+      // First try to find the product in the existing products array
+      let product = null;
+      const state = get();
+
+      if (state.products && state.products.length > 0) {
+        product = state.products.find((p) => p._id === productId);
+      }
+
+      if (
+        !product &&
+        state.discountedProducts &&
+        state.discountedProducts.length > 0
+      ) {
+        product = state.discountedProducts.find((p) => p._id === productId);
+      }
+
+      // If found in local state, use that to avoid an extra API call
+      if (product) {
+        set({ currentProduct: product, loading: false });
+        return product;
+      }
+
+      // If not found locally, fetch from API
+      const res = await axios.get(`/products/${productId}`);
+      set({ currentProduct: res.data, loading: false });
+      return res.data;
+    } catch (error) {
+      set({ loading: false, currentProduct: null });
+      console.error("Error fetching product details:", error);
+      toast.error(
+        error?.response?.data?.message || "Failed to fetch product details",
+      );
+      throw error;
+    }
+  },
 
   createProduct: async (productData) => {
     set({ loading: true });
@@ -48,6 +98,69 @@ export const useProductStore = create((set) => ({
       toast.error("Failed to fetch products. Try logging in again.");
       set({ error: "Failed to fetch products", loading: false });
       throw error;
+    }
+  },
+
+  fetchDiscountedProducts: async (page = null, limit = null) => {
+    set({ loading: true });
+    try {
+      // If page is provided, we're using pagination; otherwise just get all discounted products
+      if (page !== null) {
+        const pageToFetch = page || 1;
+        const limitToFetch = limit || 9;
+
+        const res = await axios.get(
+          `/products/discounted-products?page=${pageToFetch}&limit=${limitToFetch}`,
+        );
+        set({
+          discountedProducts: res.data.products,
+          discountedProductsTotal: res.data.total,
+          discountedProductsPage: pageToFetch,
+          discountedProductsLimit: limitToFetch,
+          loading: false,
+        });
+        return res.data;
+      } else {
+        // Original behavior for the homepage preview
+        const res = await axios.get("/products/discounted-products");
+        set({ discountedProducts: res.data, loading: false });
+        return res.data;
+      }
+    } catch (error) {
+      console.error("Error fetching discounted products:", error);
+      toast.error("Failed to fetch discounted products. Try logging in again.");
+      set({ error: "Failed to fetch discounted products", loading: false });
+      throw error;
+    }
+  },
+
+  fetchProductsByCategory: async (category) => {
+    set({ loading: true });
+    try {
+      const res = await axios.get(`/products/category/${category}`);
+      set({ products: res.data.products, loading: false });
+      return res.data.products;
+    } catch (error) {
+      console.error(`Error fetching ${category} products:`, error);
+      set({ error: `Failed to fetch ${category} products`, loading: false });
+      throw error;
+    }
+  },
+
+  fetchSimilarProducts: async (productId, category, limit = 8) => {
+    if (!productId || !category) return [];
+
+    try {
+      const res = await axios.get(
+        `/products/category/${category}?limit=${limit}`,
+      );
+      // Filter out the current product from similar products
+      const filtered = res.data.products.filter((p) => p._id !== productId);
+      set({ similarProducts: filtered });
+      return filtered;
+    } catch (error) {
+      console.error("Error fetching similar products:", error);
+      return [];
     }
   },
 

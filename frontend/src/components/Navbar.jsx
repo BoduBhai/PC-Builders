@@ -1,83 +1,170 @@
-import ThemeController from "./ThemeCTRL/ThemeController";
-
-import { Link } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { ShoppingCart, Menu, X } from "lucide-react";
 import { useUserStore } from "../stores/useUserStore";
+import ThemeController from "./ThemeCTRL/ThemeController";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
+  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
 
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close mobile menu when location changes
+  useEffect(() => {
+    setShowMobileMenu(false);
+  }, [location]);
+
+  const toggleMobileMenu = () => {
+    setShowMobileMenu(!showMobileMenu);
+  };
+
   return (
-    <header className="navbar bg-base-100 gap-3 py-5 shadow-sm">
-      <div className="flex-1">
-        <div className="flex flex-col items-start gap-2 sm:flex-row">
-          <Link to="/" className="btn btn-ghost text-xl">
-            PC Builders
+    <header
+      className={`navbar fixed top-0 right-0 left-0 z-50 py-3 transition-all duration-300 ${
+        isScrolled ? "bg-base-100 shadow-md" : "bg-base-100/80 backdrop-blur-md"
+      }`}
+    >
+      <div className="container mx-auto flex items-center justify-between px-4">
+        <div className="flex items-center">
+          {/* Mobile menu button */}
+          <button
+            className="btn btn-ghost btn-circle mr-2 md:hidden"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            {showMobileMenu ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          <Link to="/" className="btn btn-ghost px-2 text-xl font-bold">
+            <img
+              src="/LOGO.png"
+              alt="PC Builders Logo"
+              className="mr-2 h-8 w-auto"
+            />
+            {/* PC Builders */}
           </Link>
-          <input
-            type="text"
-            placeholder="Search"
-            className="input input-bordered w-3/4 sm:w-1/2"
-          />
+
+          {/* Desktop Navigation Links */}
+          <nav className="ml-6 hidden space-x-4 md:flex">
+            <Link to="/products" className="btn btn-ghost btn-sm">
+              All Products
+            </Link>
+            <Link to="/build-pc" className="btn btn-ghost btn-sm">
+              Build PC
+            </Link>
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Cart Link */}
+          <Link to="/cart" className="btn btn-ghost btn-circle relative">
+            <ShoppingCart size={22} />
+            {/* Cart badge */}
+            <span className="bg-primary text-primary-content absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold">
+              3
+            </span>
+          </Link>
+
+          {/* User Menu */}
+          {user ? (
+            <div className="dropdown dropdown-end ml-2">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar"
+              >
+                <div className="h-10 w-10 overflow-hidden rounded-full transition-transform hover:scale-110">
+                  <img
+                    alt={user?.fname || `User`}
+                    src={user?.profilePicture || `/avatar1.png`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu dropdown-content rounded-box bg-base-100 border-base-300 z-10 mt-3 w-56 border p-2 shadow-lg"
+              >
+                <li className="font-semibold">
+                  <div className="flex flex-col items-start">
+                    <span>{user?.name || "User"}</span>
+                    <span className="text-xs opacity-75">{user?.email}</span>
+                  </div>
+                </li>
+                <hr className="my-1" />
+                {isAdmin && (
+                  <li>
+                    <Link to="/dashboard" className="flex items-center">
+                      <span className="bg-primary text-primary-content mr-2 rounded-md px-2 py-0.5 text-xs">
+                        ADMIN
+                      </span>{" "}
+                      Dashboard
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <Link to="/profile">Profile</Link>
+                </li>
+                <li>
+                  <Link to="/orders">Orders</Link>
+                </li>
+                <hr className="my-1" />
+                <li>
+                  <button onClick={logout} className="text-error">
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-sm btn-primary ml-2">
+              Sign In
+            </Link>
+          )}
+
+          {/* Theme Controller */}
+          <ThemeController />
         </div>
       </div>
 
-      <nav className="flex items-center gap-4">
-        {/* TODO : Cart do */}
-        <Link to="/cart" className="relative size-8 hover:text-indigo-400">
-          <ShoppingCart size="32" />
+      {/* Mobile Menu */}
+      <div
+        className={`bg-base-100 fixed inset-0 top-[61px] z-40 transform transition-transform duration-300 ease-in-out ${
+          showMobileMenu ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <nav className="bg-base-100 container mx-auto flex flex-col space-y-4 p-4">
+          <Link to="/products" className="btn btn-ghost justify-start">
+            All Products
+          </Link>
+          <Link to="/build-pc" className="btn btn-ghost justify-start">
+            Build PC
+          </Link>
 
-          <span className="absolute -top-2 -left-2 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-xs text-white">
-            3
-          </span>
-        </Link>
-
-        {user ? (
-          <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar"
-            >
-              <div className="size-10 rounded-full">
-                {/* TODO: Add user profile image */}
-                <img
-                  alt={user?.name || `User`}
-                  src={user?.profilePicture || `avatar1.png`}
-                />
-              </div>
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 z-1 mt-3 w-52 gap-2 rounded-md border-1 p-2 font-bold shadow"
-            >
-              {isAdmin && (
-                <li className="rounded-md bg-gray-600 text-teal-500">
-                  <Link to="/dashboard">Dashboard</Link>
-                </li>
-              )}
-              <li>
-                <Link to="/profile">Profile</Link>
-              </li>
-              <li>
-                <Link to="/logout" onClick={logout}>
-                  Logout
-                </Link>
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div className="flex-none gap-2">
-            <Link to="/signup">
-              <button className="btn btn-success">Register</button>
+          {!user && (
+            <Link to="/login" className="btn btn-primary justify-start">
+              Sign In
             </Link>
-          </div>
-        )}
-      </nav>
-
-      <ThemeController />
+          )}
+        </nav>
+      </div>
     </header>
   );
 };

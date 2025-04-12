@@ -8,6 +8,10 @@ import LoginPage from "./pages/auth/LoginPage";
 import Navbar from "./components/Navbar";
 import LoadingSpinner from "./components/LoadingSpinner";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProductsPage from "./pages/ProductsPage";
+import CategoryPage from "./pages/CategoryPage";
+import DiscountedProductsPage from "./pages/products/DiscountedProductsPage";
+import ProductDetailsPage from "./pages/products/ProductDetailsPage";
 
 import { useUserStore } from "./stores/useUserStore";
 import ProfilePage from "./pages/ProfilePage";
@@ -26,6 +30,14 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:id" element={<ProductDetailsPage />} />
+        <Route path="/category/:categoryName" element={<CategoryPage />} />
+        {/* <Route path="/cart" element={<CartPage />} /> */}
+        <Route
+          path="/discounted-products"
+          element={<DiscountedProductsPage />}
+        />
         <Route
           path="/signup"
           element={!user ? <SignupPage /> : <Navigate to="/" />}
