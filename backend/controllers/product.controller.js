@@ -30,11 +30,9 @@ export const getSingleProduct = async (req, res) => {
 
 export const getDiscountedProducts = async (req, res) => {
     try {
-        // Check if pagination parameters are provided
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 0; // 0 means no limit (return all)
+        const limit = parseInt(req.query.limit) || 0;
 
-        // If no pagination is requested, use cached data
         if (!page || !limit) {
             let discountedProducts = await redis.get("discountedProducts");
 
@@ -42,7 +40,6 @@ export const getDiscountedProducts = async (req, res) => {
                 return res.status(200).json(JSON.parse(discountedProducts));
             }
 
-            // If not in cache, fetch from database
             discountedProducts = await Product.find({
                 onDiscount: true,
             }).lean();
@@ -53,7 +50,6 @@ export const getDiscountedProducts = async (req, res) => {
                     .json({ message: "No discounted products found" });
             }
 
-            // Set the cache
             await redis.set(
                 "discountedProducts",
                 JSON.stringify(discountedProducts)
@@ -62,13 +58,10 @@ export const getDiscountedProducts = async (req, res) => {
             return res.status(200).json(discountedProducts);
         }
 
-        // For paginated requests, calculate skip value
         const skip = (page - 1) * limit;
 
-        // Get total count for pagination metadata
         const total = await Product.countDocuments({ onDiscount: true });
 
-        // Fetch paginated results
         const products = await Product.find({ onDiscount: true })
             .skip(skip)
             .limit(limit)
@@ -84,7 +77,6 @@ export const getDiscountedProducts = async (req, res) => {
             });
         }
 
-        // Return paginated response
         res.status(200).json({
             products,
             total,
@@ -164,7 +156,6 @@ export const deleteProduct = async (req, res) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        // Delete the product from the cloudinary
         if (product.image) {
             const publicId = product.image.split("/").pop().split(".")[0];
             try {
@@ -248,7 +239,6 @@ export const getProductsByCategory = async (req, res) => {
     try {
         const { category } = req.params;
 
-        // Use case-insensitive regex match for category
         const categoryProducts = await Product.find({
             category: { $regex: new RegExp(`^${category}$`, "i") },
         }).lean();

@@ -167,19 +167,19 @@ const CategoryPage = () => {
   return (
     <div className="min-h-screen pt-16 pb-16">
       {/* Header */}
-      <div className="bg-base-200 py-16">
+      <div className="bg-base-200 py-8 md:py-16">
         <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-center text-4xl font-bold">
+          <h1 className="mb-3 text-center text-3xl font-bold md:mb-4 md:text-4xl">
             {categoryName}
           </h1>
-          <p className="mb-8 text-center text-lg">
+          <p className="mb-6 text-center text-base md:mb-8 md:text-lg">
             Browse our selection of {categoryName.toLowerCase()} components
           </p>
 
           {/* Search Bar */}
           <form
             onSubmit={handleSearchSubmit}
-            className="bg-base-100 mx-auto mb-8 flex max-w-2xl items-center rounded-lg px-3 shadow-md transition-all duration-300 focus-within:shadow-lg"
+            className="bg-base-100 mx-auto mb-6 flex max-w-2xl items-center rounded-lg px-3 shadow-md transition-all duration-300 focus-within:shadow-lg md:mb-8"
           >
             <Search className="mr-2 size-5 text-gray-500" />
             <input
@@ -191,28 +191,41 @@ const CategoryPage = () => {
             />
             <button
               type="button"
-              className="btn btn-circle btn-ghost btn-sm"
+              className="btn btn-circle btn-ghost btn-sm hidden md:flex"
               onClick={toggleFilters}
               aria-label="Toggle filters"
             >
               <SlidersHorizontal className="size-5" />
             </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
+              onClick={toggleFilters}
+              aria-label="Toggle filters"
+            >
+              <Filter className="size-4" />
+              <span className="text-xs">Filters</span>
+            </button>
           </form>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 md:py-8">
         {/* Filter Toggle Button for Mobile/Tablet - Fixed Position */}
         <button
           onClick={toggleFilters}
           className="btn btn-primary btn-sm fixed bottom-6 left-6 z-30 flex gap-2 shadow-lg md:hidden"
+          style={{
+            opacity: isFilterOpen ? 0 : 1,
+            pointerEvents: isFilterOpen ? "none" : "auto",
+          }}
         >
           <Filter size={16} />
-          {isFilterOpen ? "Hide Filters" : "Show Filters"}
+          Filters
         </button>
 
         {/* Desktop Filter Toggle & Sort Controls */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 md:mb-6 md:gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={toggleFilters}
@@ -230,20 +243,23 @@ const CategoryPage = () => {
                 </>
               )}
             </button>
-            <p className="text-lg">
+            <p className="text-sm font-medium md:text-lg">
               <span className="font-semibold">{totalFilteredProducts}</span>{" "}
               products found
             </p>
           </div>
 
-          <div className="ml-auto flex flex-wrap items-center gap-4">
+          <div className="ml-auto flex flex-wrap items-center gap-2 md:gap-4">
             <div className="flex items-center">
-              <label htmlFor="sort" className="mr-2 text-sm font-medium">
+              <label
+                htmlFor="sort"
+                className="mr-2 text-xs font-medium md:text-sm"
+              >
                 Sort by{" "}
               </label>
               <select
                 id="sort"
-                className="select select-bordered select-sm"
+                className="select select-bordered select-xs md:select-sm max-w-[120px] md:max-w-none"
                 value={sortOption}
                 onChange={handleSortChange}
               >
@@ -255,12 +271,15 @@ const CategoryPage = () => {
             </div>
 
             <div className="flex items-center">
-              <label htmlFor="perPage" className="mr-2 text-sm font-medium">
+              <label
+                htmlFor="perPage"
+                className="mr-2 text-xs font-medium md:text-sm"
+              >
                 Show
               </label>
               <select
                 id="perPage"
-                className="select select-bordered select-sm"
+                className="select select-bordered select-xs md:select-sm"
                 value={itemsPerPage}
                 onChange={handlePerPageChange}
               >
@@ -273,15 +292,15 @@ const CategoryPage = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row">
-          {/* Filters Section */}
+          {/* Filters Section - Full screen on mobile */}
           <div
             className={`transform transition-all duration-300 ease-in-out ${
               isFilterOpen
-                ? "max-h-[2000px] opacity-100 lg:w-1/4"
+                ? "bg-base-100 fixed inset-0 z-40 overflow-auto px-4 pt-16 pb-4 md:relative md:max-h-[2000px] md:px-4 md:opacity-100 lg:w-1/4"
                 : "max-h-0 overflow-hidden opacity-0 lg:max-h-0 lg:w-0 lg:overflow-hidden lg:opacity-0"
-            } bg-base-100 rounded-box sticky top-20 z-10 h-fit p-4 shadow-md`}
+            } rounded-box md:bg-base-100 sticky top-20 h-fit shadow-md md:p-4`}
           >
-            <div className="mb-4 flex items-center justify-between">
+            <div className="bg-base-100 sticky top-0 z-10 mb-4 flex items-center justify-between py-2">
               <h2 className="text-xl font-bold">Filters</h2>
               <button
                 className="btn btn-circle btn-ghost btn-sm"
@@ -343,6 +362,12 @@ const CategoryPage = () => {
                   onClick={handleClearFilters}
                 >
                   Clear Filters
+                </button>
+                <button
+                  className="btn btn-primary btn-block mt-3 md:hidden"
+                  onClick={toggleFilters}
+                >
+                  Apply Filters
                 </button>
               </div>
             </div>

@@ -1,15 +1,20 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCartStore } from "../../stores/useCartStore";
+import { ShoppingCart } from "lucide-react";
+import { toast } from "react-hot-toast";
+import ResponsiveImage from "./ResponsiveImage";
 
 const ProductCard = ({ product }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   const cardRef = useRef(null);
+
+  const { addToCart } = useCartStore();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Only set to visible if the element is intersecting
         if (entry.isIntersecting) {
           setIsVisible(true);
           observer.unobserve(entry.target);
@@ -28,11 +33,22 @@ const ProductCard = ({ product }) => {
     }
   }, []);
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
+  const handleAddToCart = async () => {
+    if (!product.stock) {
+      toast.error("This product is out of stock");
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+      await addToCart(product._id, 1);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
-  // Calculate savings percentage for discounted products
   const savingsPercentage = product.onDiscount
     ? Math.round(
         ((product.price - product.discountPrice) / product.price) * 100,
@@ -47,24 +63,19 @@ const ProductCard = ({ product }) => {
       } hover:-translate-y-2 hover:shadow-2xl`}
     >
       <figure className="relative h-56 overflow-hidden">
-        {!imageLoaded && (
-          <div className="absolute inset-0 animate-pulse bg-gray-200"></div>
-        )}
-
         {product.onDiscount && (
           <div className="absolute top-0 left-0 z-10 bg-red-500 px-2 py-1 font-semibold text-white">
             {savingsPercentage}% OFF
           </div>
         )}
 
-        <img
+        <ResponsiveImage
           src={product.image}
           alt={product.modelNo || product.title}
-          className={`h-full w-full object-contain transition-opacity duration-300 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          loading="lazy"
-          onLoad={handleImageLoad}
+          width={280}
+          height={224}
+          objectFit="contain"
+          className="h-full w-full"
         />
       </figure>
 
@@ -94,8 +105,18 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="card-actions mt-2">
-          <button className="btn btn-sm btn-success" disabled={!product.stock}>
-            Add to Cart
+          <button
+            className="btn btn-sm btn-success"
+            disabled={!product.stock || addingToCart}
+            onClick={handleAddToCart}
+          >
+            {addingToCart ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : (
+              <>
+                <ShoppingCart size={16} /> Add to Cart
+              </>
+            )}
           </button>
           <Link
             to={`/products/${product._id}`}

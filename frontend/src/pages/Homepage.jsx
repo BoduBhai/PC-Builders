@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { useProductStore } from "../stores/useProductStore";
 import { featuredCategories } from "../utils/constants";
 
-import LoadingSpinner from "../components/LoadingSpinner";
 const ProductCard = lazy(() => import("../components/ui/ProductCard"));
 
 // Skeleton loading component for products
@@ -40,13 +39,16 @@ const HomePage = () => {
   const hasMoreProducts = discountedProducts?.length > MAX_HOMEPAGE_PRODUCTS;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-[61px]">
       <div className="hero bg-base-200 min-h-[70vh]">
         <div className="hero-content flex-col gap-12 lg:flex-row-reverse">
           <img
-            src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?ixlib=rb-4.0.3"
+            src="/hero-image.avif"
             className="max-w-sm rounded-lg shadow-2xl"
             alt="PC Build"
+            width="384"
+            height="288"
+            loading="eager"
           />
           <div>
             <h1 className="text-5xl font-bold">Build Your Dream PC Today!</h1>
@@ -82,6 +84,9 @@ const HomePage = () => {
                     src={category.image}
                     alt={category.name}
                     className="h-full w-full object-cover"
+                    width="300"
+                    height="192"
+                    loading="lazy"
                   />
                 </figure>
                 <div className="card-body">

@@ -1,10 +1,14 @@
 import { PlusCircle, ShoppingBasket, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
-import CreateProductForm from "../../components/CreateProductForm";
-import ProductsList from "../../components/ProductsList";
-import UsersList from "../../components/UsersList";
-import Analytics from "../../components/Analytics";
+// Lazy loaded dashboard components
+const CreateProductForm = lazy(
+  () => import("../../components/CreateProductForm"),
+);
+const ProductsList = lazy(() => import("../../components/ProductsList"));
+const UsersList = lazy(() => import("../../components/UsersList"));
+const Analytics = lazy(() => import("../../components/Analytics"));
+
 import { useProductStore } from "../../stores/useProductStore";
 import { useAdminStore } from "../../stores/useAdminStore";
 import { useAnalyticsStore } from "../../stores/useAnalyticsStore";
@@ -69,10 +73,18 @@ const AdminDashboard = () => {
           ))}
         </div>
       </div>
-      {activeTab === "analytics" && <Analytics />}
-      {activeTab === "create" && <CreateProductForm />}
-      {activeTab === "products" && <ProductsList />}
-      {activeTab === "users" && <UsersList />}
+      <Suspense
+        fallback={
+          <div className="flex justify-center p-12">
+            <div className="loading loading-spinner loading-lg"></div>
+          </div>
+        }
+      >
+        {activeTab === "analytics" && <Analytics />}
+        {activeTab === "create" && <CreateProductForm />}
+        {activeTab === "products" && <ProductsList />}
+        {activeTab === "users" && <UsersList />}
+      </Suspense>
     </div>
   );
 };

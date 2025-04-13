@@ -2,15 +2,22 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import { useUserStore } from "../stores/useUserStore";
+import { useCartStore } from "../stores/useCartStore";
 import ThemeController from "./ThemeCTRL/ThemeController";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
+  const { cart, initCart } = useCartStore();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+
+  // Initialize cart data when component mounts - works for both guest and authenticated users
+  useEffect(() => {
+    initCart();
+  }, [initCart]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -53,12 +60,7 @@ const Navbar = () => {
           </button>
 
           <Link to="/" className="btn btn-ghost px-2 text-xl font-bold">
-            <img
-              src="/LOGO.png"
-              alt="PC Builders Logo"
-              className="mr-2 h-8 w-auto"
-            />
-            {/* PC Builders */}
+            PC Builders
           </Link>
 
           {/* Desktop Navigation Links */}
@@ -74,12 +76,18 @@ const Navbar = () => {
 
         <div className="flex items-center gap-2">
           {/* Cart Link */}
-          <Link to="/cart" className="btn btn-ghost btn-circle relative">
+          <Link
+            to="/cart"
+            className="btn btn-ghost btn-circle relative"
+            aria-label="Shopping Cart"
+          >
             <ShoppingCart size={22} />
-            {/* Cart badge */}
-            <span className="bg-primary text-primary-content absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold">
-              3
-            </span>
+            {/* Cart badge - show for all users, not just authenticated ones */}
+            {cart.totalItems > 0 && (
+              <span className="bg-primary text-primary-content absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold">
+                {cart.totalItems}
+              </span>
+            )}
           </Link>
 
           {/* User Menu */}
@@ -93,7 +101,7 @@ const Navbar = () => {
                 <div className="h-10 w-10 overflow-hidden rounded-full transition-transform hover:scale-110">
                   <img
                     alt={user?.fname || `User`}
-                    src={user?.profilePicture || `/avatar1.png`}
+                    src={user?.profilePicture || `/avatar1.avif`}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -104,7 +112,7 @@ const Navbar = () => {
               >
                 <li className="font-semibold">
                   <div className="flex flex-col items-start">
-                    <span>{user?.name || "User"}</span>
+                    <span>{user?.fname || "User"}</span>
                     <span className="text-xs opacity-75">{user?.email}</span>
                   </div>
                 </li>
@@ -124,6 +132,9 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link to="/orders">Orders</Link>
+                </li>
+                <li>
+                  <Link to="/cart">Shopping Cart</Link>
                 </li>
                 <hr className="my-1" />
                 <li>
@@ -157,7 +168,14 @@ const Navbar = () => {
           <Link to="/build-pc" className="btn btn-ghost justify-start">
             Build PC
           </Link>
-
+          <Link to="/cart" className="btn btn-ghost justify-start">
+            Shopping Cart
+            {cart.totalItems > 0 && (
+              <span className="bg-primary text-primary-content ml-2 rounded-md px-2 py-1 text-xs">
+                {cart.totalItems} items
+              </span>
+            )}
+          </Link>
           {!user && (
             <Link to="/login" className="btn btn-primary justify-start">
               Sign In

@@ -25,7 +25,7 @@ const storeRefreshToken = async (userId, refreshToken) => {
         `refreshToken:${userId}`,
         refreshToken,
         "EX",
-        60 * 60 * 24 * 7 // 7 days
+        60 * 60 * 24 * 7
     );
 };
 
@@ -34,14 +34,14 @@ const setCookies = (res, accessToken, refreshToken) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 };
 
@@ -62,7 +62,6 @@ export const signup = async (req, res) => {
             phone,
         });
 
-        //authenticate user
         const { accessToken, refreshToken } = generateToken(user._id);
         await storeRefreshToken(user._id, refreshToken);
 
@@ -89,7 +88,6 @@ export const login = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await user.comparePassword(password))) {
-            //generate token
             const { accessToken, refreshToken } = generateToken(user._id);
             await storeRefreshToken(user._id, refreshToken);
             setCookies(res, accessToken, refreshToken);
@@ -145,7 +143,6 @@ export const updateProfile = async (req, res) => {
             updateData.profilePicture &&
             updateData.profilePicture.startsWith("data:image")
         ) {
-            // If user already has a Cloudinary profile picture, delete it
             if (
                 currentUser.profilePicture &&
                 currentUser.profilePicture.includes("cloudinary")
@@ -253,7 +250,7 @@ export const tokenRefresh = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 15 * 60 * 1000, // 15 minutes
+            maxAge: 15 * 60 * 1000,
         });
 
         res.json({ message: "Token refreshed successfully" });

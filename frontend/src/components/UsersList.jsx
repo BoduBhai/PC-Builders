@@ -84,7 +84,7 @@ const UsersList = () => {
                     <div className="avatar">
                       <div className="mask mask-squircle h-12 w-12">
                         <img
-                          src={user.profilePicture || `avatar1.png`}
+                          src={user.profilePicture || `avatar1.avif`}
                           alt={user.name}
                         />
                       </div>
@@ -149,7 +149,7 @@ const UsersList = () => {
                 <div className="avatar">
                   <div className="mask mask-squircle h-16 w-16">
                     <img
-                      src={user.profilePicture || "avatar1.png"}
+                      src={user.profilePicture || "avatar1.avif"}
                       alt={user.name}
                     />
                   </div>

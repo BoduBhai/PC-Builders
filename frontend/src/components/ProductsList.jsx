@@ -22,7 +22,6 @@ const ProductsList = () => {
   const [productToDelete, setProductToDelete] = useState(null);
 
   const handleEditClick = (product) => {
-    // Initialize form with current product data
     setEditFormData({
       category: product.category,
       modelNo: product.modelNo,
@@ -43,7 +42,6 @@ const ProductsList = () => {
     });
   };
 
-  // Handle discount toggle with toast notification
   const handleDiscountToggle = async (product, discountData) => {
     try {
       if (!product.onDiscount) {
@@ -60,7 +58,6 @@ const ProductsList = () => {
     }
   };
 
-  // Handle product update with toast notification
   const handleProductUpdate = async (productId) => {
     try {
       await updateProduct(productId, editFormData);
@@ -73,13 +70,11 @@ const ProductsList = () => {
     }
   };
 
-  // Show delete confirmation modal
   const handleDeleteClick = (product) => {
     setProductToDelete(product);
     document.getElementById("delete_product_modal").showModal();
   };
 
-  // Handle product deletion
   const confirmProductDelete = async () => {
     try {
       await deleteProduct(productToDelete?._id);
@@ -97,7 +92,6 @@ const ProductsList = () => {
     <div className="bg-base-200 container mx-auto mt-10 mb-20 max-w-6xl rounded-lg p-5 shadow-md">
       <div className="overflow-x-auto">
         <table className="table">
-          {/* head */}
           <thead>
             <tr>
               <th>Product</th>
@@ -167,10 +161,8 @@ const ProductsList = () => {
         </table>
       </div>
 
-      {/* Moved dialogs outside the table structure */}
       {products?.map((product) => (
         <div key={`dialogs-${product._id}`}>
-          {/* Discount Modal */}
           <dialog
             id={`discount_modal_${product._id}`}
             className="modal modal-bottom sm:modal-middle"
@@ -286,7 +278,6 @@ const ProductsList = () => {
             </div>
           </dialog>
 
-          {/* Edit Product Modal */}
           <dialog
             id={`edit_modal_${product._id}`}
             className="modal modal-bottom sm:modal-middle"
@@ -296,7 +287,6 @@ const ProductsList = () => {
                 Edit Product: {product?.modelNo}
               </h3>
               <div className="space-y-4 py-4">
-                {/* Model Number */}
                 <label className="form-control w-full">
                   <div className="label">
                     <span className="label-text">Model Number</span>
@@ -311,7 +301,6 @@ const ProductsList = () => {
                   />
                 </label>
 
-                {/* Category & Brand */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <label className="form-control w-full">
                     <div className="label">
@@ -368,7 +357,6 @@ const ProductsList = () => {
                   </label>
                 </div>
 
-                {/* Price & Stock */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <label className="form-control w-full">
                     <div className="label">
@@ -399,7 +387,6 @@ const ProductsList = () => {
                   </label>
                 </div>
 
-                {/* Color */}
                 <label className="form-control w-full">
                   <div className="label">
                     <span className="label-text">Color</span>
@@ -427,7 +414,6 @@ const ProductsList = () => {
                   </select>
                 </label>
 
-                {/* Description */}
                 <label className="form-control w-full">
                   <div className="label">
                     <span className="label-text">Description</span>
@@ -463,7 +449,6 @@ const ProductsList = () => {
         </div>
       ))}
 
-      {/* Delete Product Confirmation Modal */}
       <dialog
         id="delete_product_modal"
         className="modal modal-bottom sm:modal-middle"

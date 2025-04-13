@@ -24,6 +24,14 @@ export const useUserStore = create((set, get) => ({
         phone,
       });
       set({ user: res.data, loading: false });
+
+      // Import dynamically to avoid circular dependency
+      const { useCartStore } = await import("./useCartStore");
+
+      // Merge local cart with server cart after signup
+      setTimeout(() => {
+        useCartStore.getState().mergeLocalCartWithServerCart();
+      }, 500); // Small delay to ensure user state is updated first
     } catch (error) {
       set({ loading: false });
       toast.error(error.response.data.message || "Something went wrong!");
@@ -36,6 +44,14 @@ export const useUserStore = create((set, get) => ({
     try {
       const res = await axios.post("/auth/login", { email, password });
       set({ user: res.data, loading: false });
+
+      // Import dynamically to avoid circular dependency
+      const { useCartStore } = await import("./useCartStore");
+
+      // Merge local cart with server cart after login
+      setTimeout(() => {
+        useCartStore.getState().mergeLocalCartWithServerCart();
+      }, 500); // Small delay to ensure user state is updated first
     } catch (error) {
       set({ loading: false });
       toast.error(error.response.data.message || "Something went wrong!");

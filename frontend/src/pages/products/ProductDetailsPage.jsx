@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -8,13 +8,33 @@ import {
   ChevronLeft,
   Check,
 } from "lucide-react";
-// Removed Share2 import
 import { toast } from "react-hot-toast";
 
 import { useProductStore } from "../../stores/useProductStore";
+import { useCartStore } from "../../stores/useCartStore";
+import { useUserStore } from "../../stores/useUserStore";
 import { formatDate } from "../../utils/dateUtils";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import ProductCard from "../../components/ui/ProductCard";
+
+// Lazy load ProductCard component
+const ProductCard = lazy(() => import("../../components/ui/ProductCard"));
+
+// Small skeleton loader for product cards
+const ProductCardSkeleton = () => (
+  <div className="card bg-base-100 animate-pulse shadow-xl">
+    <div className="h-56 bg-gray-300"></div>
+    <div className="card-body">
+      <div className="mb-2 h-4 w-3/4 bg-gray-300"></div>
+      <div className="mb-4 h-4 w-1/2 bg-gray-300"></div>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="h-6 w-1/4 bg-gray-300"></div>
+      </div>
+      <div className="card-actions mt-2 flex gap-2">
+        <div className="h-8 w-24 rounded bg-gray-300"></div>
+      </div>
+    </div>
+  </div>
+);
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -27,6 +47,8 @@ const ProductDetailsPage = () => {
     currentProduct,
     similarProducts,
   } = useProductStore();
+  const { addToCart } = useCartStore();
+  const { user } = useUserStore();
   const [addingToCart, setAddingToCart] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedTab, setSelectedTab] = useState("description");
@@ -73,17 +95,30 @@ const ProductDetailsPage = () => {
     };
   }, []);
 
-  const handleAddToCart = () => {
-    if (!currentProduct?.stock) return;
+  const handleAddToCart = async () => {
+    if (!currentProduct?.stock) {
+      toast.error("This product is out of stock");
+      return;
+    }
 
     setAddingToCart(true);
-    setTimeout(() => {
-      toast.success(`${currentProduct?.modelNo || "Product"} added to cart!`);
+
+    try {
+      await addToCart(currentProduct._id, 1);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    } finally {
       setAddingToCart(false);
-    }, 800);
+    }
   };
 
   const toggleWishlist = () => {
+    if (!user) {
+      toast.error("Please log in to add items to wishlist");
+      navigate("/login");
+      return;
+    }
+
     setIsWishlisted(!isWishlisted);
     toast.success(
       isWishlisted
@@ -480,7 +515,9 @@ const ProductDetailsPage = () => {
                       className={`w-full flex-shrink-0 flex-grow-0 sm:w-1/2 lg:w-1/4`}
                       style={{ maxWidth: `calc(100% / ${visibleSlides})` }}
                     >
-                      <ProductCard product={product} />
+                      <Suspense fallback={<ProductCardSkeleton />}>
+                        <ProductCard product={product} />
+                      </Suspense>
                     </div>
                   ))}
                 </div>
