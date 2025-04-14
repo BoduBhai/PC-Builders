@@ -38,7 +38,7 @@ export const getCart = async (req, res) => {
         // If not in cache, fetch from database
         const user = await User.findById(userId).populate({
             path: "cartItems.product",
-            select: "modelNo description price image category stock brand onDiscount discountPrice",
+            select: "modelNo price image category stock brand onDiscount discountPrice",
         });
 
         if (!user || !user.cartItems) {
@@ -99,12 +99,10 @@ export const addToCart = async (req, res) => {
 
             // Check if new quantity exceeds stock
             if (newQuantity > product.stock) {
-                return res
-                    .status(400)
-                    .json({
-                        message:
-                            "Cannot add more of this item (stock limit reached)",
-                    });
+                return res.status(400).json({
+                    message:
+                        "Cannot add more of this item (stock limit reached)",
+                });
             }
 
             user.cartItems[existingItemIndex].quantity = newQuantity;
@@ -122,7 +120,7 @@ export const addToCart = async (req, res) => {
         // Return updated cart data with product details
         const updatedUser = await User.findById(userId).populate({
             path: "cartItems.product",
-            select: "modelNo description price image category stock brand onDiscount discountPrice",
+            select: "modelNo price image category stock brand onDiscount discountPrice",
         });
 
         // Calculate cart totals
@@ -155,11 +153,9 @@ export const updateCartItem = async (req, res) => {
         }
 
         if (quantity > product.stock) {
-            return res
-                .status(400)
-                .json({
-                    message: "Requested quantity exceeds available stock",
-                });
+            return res.status(400).json({
+                message: "Requested quantity exceeds available stock",
+            });
         }
 
         // Find user and update cart item
@@ -179,7 +175,7 @@ export const updateCartItem = async (req, res) => {
         // Return updated cart
         const updatedUser = await User.findById(userId).populate({
             path: "cartItems.product",
-            select: "modelNo description price image category stock brand onDiscount discountPrice",
+            select: "modelNo price image category stock brand onDiscount discountPrice",
         });
 
         // Calculate cart totals
@@ -218,7 +214,7 @@ export const removeCartItem = async (req, res) => {
         // Return updated cart
         const updatedUser = await User.findById(userId).populate({
             path: "cartItems.product",
-            select: "modelNo description price image category stock brand onDiscount discountPrice",
+            select: "modelNo price image category stock brand onDiscount discountPrice",
         });
 
         // Calculate cart totals

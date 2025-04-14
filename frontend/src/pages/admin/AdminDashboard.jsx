@@ -1,90 +1,48 @@
-import { PlusCircle, ShoppingBasket, Users } from "lucide-react";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense } from "react";
+import { Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
-// Lazy loaded dashboard components
-const CreateProductForm = lazy(
-  () => import("../../components/CreateProductForm"),
-);
-const ProductsList = lazy(() => import("../../components/ProductsList"));
-const UsersList = lazy(() => import("../../components/UsersList"));
+// Lazy loaded dashboard component
 const Analytics = lazy(() => import("../../components/Analytics"));
 
-import { useProductStore } from "../../stores/useProductStore";
-import { useAdminStore } from "../../stores/useAdminStore";
 import { useAnalyticsStore } from "../../stores/useAnalyticsStore";
 
-const tabs = [
-  {
-    id: "analytics",
-    label: "Analytics",
-    icon: ShoppingBasket,
-  },
-  {
-    id: "create",
-    label: "Create Product",
-    icon: PlusCircle,
-  },
-  {
-    id: "products",
-    label: "Products",
-    icon: ShoppingBasket,
-  },
-  {
-    id: "users",
-    label: "Users",
-    icon: Users,
-  },
-];
-
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("analytics");
-
-  const { getAllUsers } = useAdminStore();
-  const { fetchProducts } = useProductStore();
   const { fetchAnalytics } = useAnalyticsStore();
 
   useEffect(() => {
     fetchAnalytics();
-    fetchProducts();
-    getAllUsers();
-  }, [fetchAnalytics, fetchProducts, getAllUsers]);
+  }, [fetchAnalytics]);
 
   return (
     <div className="min-h-screen">
       <h1 className="text-success mt-10 text-center text-4xl font-extrabold">
         Admin Dashboard
       </h1>
-      <div className="mt-10 flex justify-center">
-        <div
-          role="tablist"
-          className="tabs tabs-border bg-base-300 flex-col gap-5 rounded-md px-5 font-bold sm:flex-row"
-        >
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`tab tab-bordered ${
-                activeTab === tab.id ? "tab-active" : ""
-              }`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <tab.icon className="mr-2 size-4" />
-              {tab.label}
-            </button>
-          ))}
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Management Section Link */}
+        <div className="mb-8 flex justify-end">
+          <Link to="/admin/management" className="btn btn-primary">
+            <Settings className="mr-2" size={18} />
+            Management Section
+          </Link>
+        </div>
+
+        {/* Main Analytics Section */}
+        <div className="bg-base-100 rounded-lg p-6 shadow-lg">
+          <h2 className="mb-6 text-2xl font-bold">Analytics Overview</h2>
+          <Suspense
+            fallback={
+              <div className="flex justify-center p-12">
+                <div className="loading loading-spinner loading-lg"></div>
+              </div>
+            }
+          >
+            <Analytics />
+          </Suspense>
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="flex justify-center p-12">
-            <div className="loading loading-spinner loading-lg"></div>
-          </div>
-        }
-      >
-        {activeTab === "analytics" && <Analytics />}
-        {activeTab === "create" && <CreateProductForm />}
-        {activeTab === "products" && <ProductsList />}
-        {activeTab === "users" && <UsersList />}
-      </Suspense>
     </div>
   );
 };

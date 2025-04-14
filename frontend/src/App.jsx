@@ -11,6 +11,9 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminManagementPage = lazy(
+  () => import("./pages/admin/AdminManagementPage"),
+);
 const ProductsPage = lazy(() => import("./pages/ProductsPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const DiscountedProductsPage = lazy(
@@ -20,6 +23,11 @@ const ProductDetailsPage = lazy(
   () => import("./pages/products/ProductDetailsPage"),
 );
 const CartPage = lazy(() => import("./pages/CartPage"));
+const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+const OrderConfirmationPage = lazy(
+  () => import("./pages/OrderConfirmationPage"),
+);
+const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 
 import { useUserStore } from "./stores/useUserStore";
@@ -81,6 +89,22 @@ function App() {
             element={user ? <ProfilePage /> : <Navigate to="/login" />}
           />
 
+          {/* Checkout and Orders */}
+          <Route
+            path="/checkout"
+            element={user ? <CheckoutPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/order-confirmation/:orderId"
+            element={
+              user ? <OrderConfirmationPage /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/orders"
+            element={user ? <OrdersPage /> : <Navigate to="/login" />}
+          />
+
           {/* Admin */}
           <Route
             path="/dashboard"
@@ -88,6 +112,17 @@ function App() {
               user &&
               (user?.role === "admin" || user?.role === "superadmin") ? (
                 <AdminDashboard />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+          <Route
+            path="/admin/management"
+            element={
+              user &&
+              (user?.role === "admin" || user?.role === "superadmin") ? (
+                <AdminManagementPage />
               ) : (
                 <Navigate to="/" />
               )
