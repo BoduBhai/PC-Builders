@@ -1,5 +1,12 @@
-import { PlusCircle, ShoppingBasket, Users, ShoppingCart } from "lucide-react";
+import {
+  PlusCircle,
+  ShoppingBasket,
+  Users,
+  ShoppingCart,
+  LayoutDashboard,
+} from "lucide-react";
 import { useState, useEffect, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
 
 // Lazy loaded components
 const CreateProductForm = lazy(
@@ -56,9 +63,15 @@ const AdminManagementPage = () => {
   }, [activeTab, fetchProducts, getAllUsers, fetchAllOrders]);
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-52">
       <div className="container mx-auto px-4">
-        <h1 className="mb-8 text-3xl font-bold">Management Dashboard</h1>
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Management Dashboard</h1>
+          <Link to="/dashboard" className="btn btn-primary">
+            <LayoutDashboard className="mr-2 size-4" />
+            Back to Dashboard
+          </Link>
+        </div>
 
         <div className="mt-10 flex justify-center">
           <div

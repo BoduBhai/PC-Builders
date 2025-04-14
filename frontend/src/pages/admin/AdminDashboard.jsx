@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   }, [fetchAnalytics]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-[61px]">
       <h1 className="text-success mt-10 text-center text-4xl font-extrabold">
         Admin Dashboard
       </h1>
