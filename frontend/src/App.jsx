@@ -32,8 +32,10 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 
 import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
+import useScrollToTop from "./components/ThemeCTRL/useScrollTop";
 
 function App() {
+  useScrollToTop();
   const { user, checkingAuth, checkAuth } = useUserStore();
   const { initCart } = useCartStore();
 
