@@ -101,7 +101,7 @@ const Navbar = () => {
                 <div className="h-10 w-10 overflow-hidden rounded-full transition-transform hover:scale-110">
                   <img
                     alt={user?.fname || `User`}
-                    src={user?.profilePicture || `/avatar1.avif`}
+                    src={user?.profilePicture || `/avatar.avif`}
                     className="h-full w-full object-cover"
                   />
                 </div>

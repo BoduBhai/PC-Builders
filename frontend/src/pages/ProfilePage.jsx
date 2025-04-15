@@ -13,7 +13,7 @@ const ProfilePage = () => {
     confirmPassword: "",
   });
 
-  const avatarUrl = user?.profilePicture || "/avatar1.avif";
+  const avatarUrl = user?.profilePicture || "/avatar.avif";
 
   const handleEditClick = () => {
     setEditFormData({
