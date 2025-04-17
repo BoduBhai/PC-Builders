@@ -61,7 +61,9 @@ const HomePage = () => {
               <Link to={"/products"}>
                 <button className="btn btn-primary">Shop Components</button>
               </Link>
-              <button className="btn btn-outline">Build a PC</button>
+              <Link to={"/build-pc"}>
+                <button className="btn btn-outline">Build a PC</button>
+              </Link>
             </div>
           </div>
         </div>

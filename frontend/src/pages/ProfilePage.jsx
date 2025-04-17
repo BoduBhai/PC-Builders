@@ -3,15 +3,67 @@ import { useUserStore } from "../stores/useUserStore";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { formatDate } from "../utils/dateUtils";
+import FormInput from "../components/ui/forms/FormInput";
+import Button from "../components/ui/forms/Button";
+import useForm from "../hooks/useForm";
 
 const ProfilePage = () => {
   const { user, loading, updateUserProfile, changePassword } = useUserStore();
   const [editFormData, setEditFormData] = useState({});
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+
+  // Use our custom useForm hook for password change
+  const {
+    values: passwordData,
+    handleChange: handlePasswordChange,
+    handleSubmit: handlePasswordFormSubmit,
+    setValues: setPasswordData,
+    errors: passwordErrors,
+    setErrors: setPasswordErrors,
+  } = useForm(
+    {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+    async (values) => {
+      if (values.newPassword !== values.confirmPassword) {
+        setPasswordErrors({
+          confirmPassword: "Passwords don't match",
+        });
+        return;
+      } else if (values.newPassword.length < 6) {
+        setPasswordErrors({
+          newPassword: "Password must be at least 6 characters",
+        });
+        return;
+      }
+
+      try {
+        toast.loading("Updating password...", { id: "passwordChange" });
+
+        await changePassword({
+          currentPassword: values.currentPassword,
+          newPassword: values.newPassword,
+        });
+
+        document.getElementById("change_password_modal").close();
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        toast.success("Password updated successfully", {
+          id: "passwordChange",
+        });
+      } catch (error) {
+        const errorMsg =
+          error?.response?.data?.message || "Failed to update password";
+        toast.error(errorMsg, { id: "passwordChange" });
+        console.error("Password change error:", error);
+      }
+    },
+  );
 
   const avatarUrl = user?.profilePicture || "/avatar.avif";
 
@@ -65,48 +117,6 @@ const ProfilePage = () => {
       toast.error(errorMsg, { id: "profileUpdate" });
 
       console.error("Profile update error:", error);
-    }
-  };
-
-  // Password Change Handlers
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData({
-      ...passwordData,
-      [name]: value,
-    });
-  };
-
-  const handlePasswordSubmit = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("New passwords don't match");
-      return;
-    } else if (passwordData.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-
-    try {
-      toast.loading("Updating password...", { id: "passwordChange" });
-
-      await changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-      });
-
-      document.getElementById("change_password_modal").close();
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-
-      toast.success("Password updated successfully", { id: "passwordChange" });
-    } catch (error) {
-      const errorMsg =
-        error?.response?.data?.message || "Failed to update password";
-      toast.error(errorMsg, { id: "passwordChange" });
-      console.error("Password change error:", error);
     }
   };
 
@@ -336,58 +346,44 @@ const ProfilePage = () => {
             </div>
 
             {/* Name */}
-
             <div className="flex flex-col gap-2 sm:flex-row">
-              <label className="form-control w-full">
-                <div className="label">
-                  <span className="label-text">First Name</span>
-                </div>
-                <input
-                  type="text"
-                  name="fname"
-                  placeholder="Your first name"
-                  className="input input-bordered w-full"
-                  value={editFormData.fname || ""}
-                  onChange={handleEditChange}
-                />
-              </label>
-              <label className="form-control w-full">
-                <div className="label">
-                  <span className="label-text">Last Name</span>
-                </div>
-                <input
-                  type="text"
-                  name="lname"
-                  placeholder="Your last name"
-                  className="input input-bordered w-full"
-                  value={editFormData.lname || ""}
-                  onChange={handleEditChange}
-                />
-              </label>
+              <FormInput
+                label="First Name"
+                type="text"
+                name="fname"
+                placeholder="Your first name"
+                value={editFormData.fname || ""}
+                onChange={handleEditChange}
+                className="w-full"
+              />
+              <FormInput
+                label="Last Name"
+                type="text"
+                name="lname"
+                placeholder="Your last name"
+                value={editFormData.lname || ""}
+                onChange={handleEditChange}
+                className="w-full"
+              />
             </div>
 
             {/* Phone */}
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">Phone Number</span>
-              </div>
-              <input
-                type="tel"
-                name="phone"
-                placeholder="01X XXXXXXX"
-                pattern="[0-9]{10,11}"
-                maxLength={11}
-                className="input input-bordered w-full"
-                value={editFormData.phone || ""}
-                onChange={handleEditChange}
-              />
-            </label>
+            <FormInput
+              label="Phone Number"
+              type="tel"
+              name="phone"
+              placeholder="01X XXXXXXX"
+              pattern="[0-9]{10,11}"
+              maxLength={11}
+              value={editFormData.phone || ""}
+              onChange={handleEditChange}
+            />
 
             {/* Address */}
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">Address</span>
-              </div>
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text font-medium">Address</span>
+              </label>
               <textarea
                 name="address"
                 className="textarea textarea-bordered w-full"
@@ -396,7 +392,7 @@ const ProfilePage = () => {
                 value={editFormData.address || ""}
                 onChange={handleEditChange}
               ></textarea>
-            </label>
+            </div>
           </div>
 
           <div className="modal-action">
@@ -405,10 +401,12 @@ const ProfilePage = () => {
                 <span className="loading loading-spinner loading-xl text-primary" />
               ) : (
                 <>
-                  <button className="btn btn-outline mr-2">Cancel</button>
-                  <button className="btn btn-primary" onClick={handleSubmit}>
+                  <Button variant="outline" className="mr-2">
+                    Cancel
+                  </Button>
+                  <Button variant="primary" onClick={handleSubmit}>
                     Save Changes
-                  </button>
+                  </Button>
                 </>
               )}
             </form>
@@ -425,54 +423,44 @@ const ProfilePage = () => {
           <h3 className="text-lg font-bold">Change Password</h3>
           <div className="flex flex-col gap-4 py-4">
             {/* Current Password */}
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">Current Password</span>
-              </div>
-              <input
-                type="password"
-                name="currentPassword"
-                placeholder="Enter your current password"
-                className="input input-bordered mt-2 w-full"
-                value={passwordData.currentPassword}
-                onChange={handlePasswordChange}
-              />
-            </label>
+            <FormInput
+              label="Current Password"
+              type="password"
+              name="currentPassword"
+              placeholder="Enter your current password"
+              value={passwordData.currentPassword}
+              onChange={handlePasswordChange}
+              required
+            />
 
             {/* New Password */}
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">New Password</span>
-              </div>
-              <input
-                type="password"
-                name="newPassword"
-                placeholder="Enter new password"
-                className="input input-bordered mt-2 w-full"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-              />
-              <div className="label">
-                <span className="label-text-alt text-gray-500">
-                  Must be at least 6 characters
-                </span>
-              </div>
-            </label>
+            <FormInput
+              label="New Password"
+              type="password"
+              name="newPassword"
+              placeholder="Enter new password"
+              value={passwordData.newPassword}
+              onChange={handlePasswordChange}
+              required
+              minLength="6"
+              error={passwordErrors.newPassword}
+              className="mt-2"
+            />
+            <div className="mt-[-10px] text-xs text-gray-500">
+              Must be at least 6 characters
+            </div>
 
             {/* Confirm New Password */}
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">Confirm New Password</span>
-              </div>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm your new password"
-                className="input input-bordered mt-2 w-full"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-              />
-            </label>
+            <FormInput
+              label="Confirm New Password"
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm your new password"
+              value={passwordData.confirmPassword}
+              onChange={handlePasswordChange}
+              required
+              error={passwordErrors.confirmPassword}
+            />
           </div>
 
           <div className="modal-action">
@@ -481,13 +469,12 @@ const ProfilePage = () => {
                 <span className="loading loading-spinner loading-xl text-info" />
               ) : (
                 <>
-                  <button className="btn btn-outline mr-2">Cancel</button>
-                  <button
-                    className="btn btn-info"
-                    onClick={handlePasswordSubmit}
-                  >
+                  <Button variant="outline" className="mr-2">
+                    Cancel
+                  </Button>
+                  <Button variant="info" onClick={handlePasswordFormSubmit}>
                     Update Password
-                  </button>
+                  </Button>
                 </>
               )}
             </form>

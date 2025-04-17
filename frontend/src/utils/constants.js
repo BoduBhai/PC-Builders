@@ -23,6 +23,7 @@ export const brandOptions = [
   "Logitech",
   "Microsoft",
   "MSI",
+  "Noctua",
   "NZXT",
   "NVIDIA",
   "PNY",
@@ -58,7 +59,6 @@ export const colorOptions = [
 
 export const categoryOptions = [
   "Accessories",
-  "Casing Fan",
   "Computer Case",
   "Cooling Fan",
   "CPU Cooler",

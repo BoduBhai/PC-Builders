@@ -23,6 +23,7 @@ const ProductDetailsPage = lazy(
   () => import("./pages/products/ProductDetailsPage"),
 );
 const CartPage = lazy(() => import("./pages/CartPage"));
+const BuildPCPage = lazy(() => import("./pages/BuildPCPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const OrderConfirmationPage = lazy(
   () => import("./pages/OrderConfirmationPage"),
@@ -90,6 +91,7 @@ function App() {
             path="/profile"
             element={user ? <ProfilePage /> : <Navigate to="/login" />}
           />
+          <Route path="/build-pc" element={<BuildPCPage />} />
 
           {/* Checkout and Orders */}
           <Route
