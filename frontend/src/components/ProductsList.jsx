@@ -120,9 +120,9 @@ const ProductsList = () => {
                   </div>
                 </td>
                 <td>
-                  {product?.price} <br />
+                  ৳{product?.price} <br />
                   <span className="badge badge-ghost badge-sm text-red-600">
-                    {product?.discountPrice || "N/A"}
+                    ৳{product?.discountPrice || "N/A"}
                   </span>
                 </td>
                 <td>{product?.stock}</td>
@@ -178,7 +178,7 @@ const ProductsList = () => {
                     <div className="label">
                       Original Price:
                       <span className="label-text-alt text-success">
-                        ${product?.price}
+                        ৳{product?.price}
                       </span>
                     </div>
                     <input

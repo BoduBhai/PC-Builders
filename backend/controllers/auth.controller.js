@@ -139,6 +139,7 @@ export const updateProfile = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
+        // Handle profile picture upload
         if (
             updateData.profilePicture &&
             updateData.profilePicture.startsWith("data:image")
@@ -170,6 +171,18 @@ export const updateProfile = async (req, res) => {
             );
 
             updateData.profilePicture = cloudinaryResponse.secure_url;
+        }
+
+        // Handle structured address update
+        if (updateData.address) {
+            // If address is coming as a string, convert it to the street field
+            if (typeof updateData.address === "string") {
+                updateData.address = {
+                    ...currentUser.address,
+                    street: updateData.address,
+                };
+            }
+            // If it's an object with street, city, etc. - use as is
         }
 
         const user = await User.findByIdAndUpdate(

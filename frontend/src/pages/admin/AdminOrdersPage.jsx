@@ -296,7 +296,7 @@ const AdminOrdersPage = () => {
                       <span>{formatDate(order.createdAt)}</span>
                     </div>
                   </td>
-                  <td className="font-semibold">${order.total.toFixed(2)}</td>
+                  <td className="font-semibold">৳{order.total.toFixed(2)}</td>
                   <td>{getOrderStatusBadge(order.orderStatus)}</td>
                   <td>
                     <div className="flex items-center gap-2">
@@ -460,9 +460,9 @@ const AdminOrdersPage = () => {
                               </div>
                             </div>
                           </td>
-                          <td>${item.price.toFixed(2)}</td>
+                          <td>৳{item.price.toFixed(2)}</td>
                           <td>{item.quantity}</td>
-                          <td>${(item.price * item.quantity).toFixed(2)}</td>
+                          <td>৳{(item.price * item.quantity).toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -476,19 +476,19 @@ const AdminOrdersPage = () => {
                 <div className="bg-base-200 rounded p-3">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${currentOrder.subtotal.toFixed(2)}</span>
+                    <span>৳{currentOrder.subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tax</span>
-                    <span>${currentOrder.tax.toFixed(2)}</span>
+                    <span>৳{currentOrder.tax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>${currentOrder.shipping.toFixed(2)}</span>
+                    <span>৳{currentOrder.shipping.toFixed(2)}</span>
                   </div>
                   <div className="mt-2 flex justify-between border-t pt-2 font-semibold">
                     <span>Total</span>
-                    <span>${currentOrder.total.toFixed(2)}</span>
+                    <span>৳{currentOrder.total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

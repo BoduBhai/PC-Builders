@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useOrderStore } from "../stores/useOrderStore";
 import { useUserStore } from "../stores/useUserStore";
+import { useCartStore } from "../stores/useCartStore";
 import { formatDate } from "../utils/dateUtils";
 import {
   CheckCircle,
@@ -17,6 +18,7 @@ const OrderConfirmationPage = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
   const { currentOrder, fetchOrderById, loading } = useOrderStore();
+  const { clearCart } = useCartStore();
 
   useEffect(() => {
     if (!user) {
@@ -28,6 +30,9 @@ const OrderConfirmationPage = () => {
     const loadOrder = async () => {
       try {
         await fetchOrderById(orderId);
+
+        // Clear the cart once the order is confirmed and loaded
+        clearCart();
       } catch (error) {
         // If there's an error fetching the order, redirect to orders page
         console.error("Error fetching order:", error);
@@ -36,7 +41,7 @@ const OrderConfirmationPage = () => {
     };
 
     loadOrder();
-  }, [fetchOrderById, navigate, orderId, user]);
+  }, [fetchOrderById, navigate, orderId, user, clearCart]);
 
   if (loading || !currentOrder) {
     return (
@@ -88,7 +93,7 @@ const OrderConfirmationPage = () => {
               TOTAL AMOUNT
             </h3>
             <p className="text-lg font-semibold">
-              ${currentOrder.total.toFixed(2)}
+              ৳{currentOrder.total.toFixed(2)}
             </p>
           </div>
 
@@ -178,7 +183,7 @@ const OrderConfirmationPage = () => {
                   </div>
                 </div>
                 <div className="font-medium">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ৳{(item.price * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}
@@ -204,20 +209,20 @@ const OrderConfirmationPage = () => {
             <div className="space-y-1">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${currentOrder.subtotal.toFixed(2)}</span>
+                <span>৳{currentOrder.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax:</span>
-                <span>${currentOrder.tax.toFixed(2)}</span>
+                <span>৳{currentOrder.tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping:</span>
-                <span>${currentOrder.shipping.toFixed(2)}</span>
+                <span>৳{currentOrder.shipping.toFixed(2)}</span>
               </div>
               <div className="border-t pt-1">
                 <div className="flex justify-between font-semibold">
                   <span>Total:</span>
-                  <span>${currentOrder.total.toFixed(2)}</span>
+                  <span>৳{currentOrder.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -233,7 +238,7 @@ const OrderConfirmationPage = () => {
             <div className="mb-3 text-sm">
               <div className="mb-1 grid grid-cols-2">
                 <span className="font-medium">Bank:</span>
-                <span>Example Bank</span>
+                <span>Bangladesh Bank</span>
               </div>
               <div className="mb-1 grid grid-cols-2">
                 <span className="font-medium">Account Name:</span>

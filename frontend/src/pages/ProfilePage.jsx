@@ -6,10 +6,23 @@ import { formatDate } from "../utils/dateUtils";
 import FormInput from "../components/ui/forms/FormInput";
 import Button from "../components/ui/forms/Button";
 import useForm from "../hooks/useForm";
+import { MapPin, Mail, Phone } from "lucide-react";
 
 const ProfilePage = () => {
   const { user, loading, updateUserProfile, changePassword } = useUserStore();
-  const [editFormData, setEditFormData] = useState({});
+  const [editFormData, setEditFormData] = useState({
+    fname: "",
+    lname: "",
+    phone: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "United States",
+    },
+    profilePicture: null,
+  });
 
   // Use our custom useForm hook for password change
   const {
@@ -72,7 +85,13 @@ const ProfilePage = () => {
       fname: user?.fname || "",
       lname: user?.lname || "",
       phone: user?.phone || "",
-      address: user?.address || "",
+      address: {
+        street: user?.address?.street || "",
+        city: user?.address?.city || "",
+        state: user?.address?.state || "",
+        zipCode: user?.address?.zipCode || "",
+        country: user?.address?.country || "United States",
+      },
       profilePicture: user?.profilePicture || null,
     });
     document.getElementById("edit_profile_modal").showModal();
@@ -80,10 +99,22 @@ const ProfilePage = () => {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditFormData({
-      ...editFormData,
-      [name]: value,
-    });
+
+    if (name.startsWith("address.")) {
+      const addressField = name.split(".")[1];
+      setEditFormData({
+        ...editFormData,
+        address: {
+          ...editFormData.address,
+          [addressField]: value,
+        },
+      });
+    } else {
+      setEditFormData({
+        ...editFormData,
+        [name]: value,
+      });
+    }
   };
 
   const handleImageChange = (e) => {
@@ -118,6 +149,23 @@ const ProfilePage = () => {
 
       console.error("Profile update error:", error);
     }
+  };
+
+  // Format full address for display
+  const formatFullAddress = () => {
+    if (!user?.address) return "No address provided";
+
+    const { street, city, state, zipCode, country } = user.address;
+    const parts = [];
+
+    if (street) parts.push(street);
+    if (city && state) parts.push(`${city}, ${state}`);
+    else if (city) parts.push(city);
+    else if (state) parts.push(state);
+    if (zipCode) parts.push(zipCode);
+    if (country && country !== "United States") parts.push(country);
+
+    return parts.length > 0 ? parts.join(", ") : "No address provided";
   };
 
   return (
@@ -186,23 +234,29 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* // TODO: Username */}
-
                 <div className="stat">
                   <div className="stat-title">Email</div>
-                  <div className="stat-value text-lg">{user?.email}</div>
+                  <div className="stat-value flex items-center gap-2 text-lg">
+                    <Mail size={16} /> {user?.email}
+                  </div>
                 </div>
 
                 <div className="stat">
                   <div className="stat-title">Phone</div>
-                  <div className="stat-value text-lg">{user?.phone}</div>
+                  <div className="stat-value flex items-center gap-2 text-lg">
+                    <Phone size={16} /> {user?.phone}
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <div className="mb-1 font-semibold">Address</div>
-                <div className="bg-base-200 rounded-lg p-3">
-                  {user?.address || "No address provided"}
+              {/* Address Information with Icon */}
+              <div className="mt-6">
+                <h3 className="mb-2 flex items-center gap-2 font-semibold">
+                  <MapPin size={18} />
+                  Shipping Address
+                </h3>
+                <div className="bg-base-200 rounded-lg p-4">
+                  {formatFullAddress()}
                 </div>
               </div>
             </div>
@@ -379,19 +433,78 @@ const ProfilePage = () => {
               onChange={handleEditChange}
             />
 
-            {/* Address */}
+            {/* Address Fields */}
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text font-medium">Address</span>
+                <span className="label-text font-medium">Street Address</span>
               </label>
-              <textarea
-                name="address"
-                className="textarea textarea-bordered w-full"
-                rows="3"
-                placeholder="Your address"
-                value={editFormData.address || ""}
+              <input
+                name="address.street"
+                className="input input-bordered w-full"
+                placeholder="Street address"
+                value={editFormData.address?.street || ""}
                 onChange={handleEditChange}
-              ></textarea>
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-medium">City</span>
+                </label>
+                <input
+                  name="address.city"
+                  className="input input-bordered w-full"
+                  placeholder="City"
+                  value={editFormData.address?.city || ""}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-medium">State</span>
+                </label>
+                <input
+                  name="address.state"
+                  className="input input-bordered w-full"
+                  placeholder="State"
+                  value={editFormData.address?.state || ""}
+                  onChange={handleEditChange}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-medium">Zip Code</span>
+                </label>
+                <input
+                  name="address.zipCode"
+                  className="input input-bordered w-full"
+                  placeholder="Zip Code"
+                  value={editFormData.address?.zipCode || ""}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text font-medium">Country</span>
+                </label>
+                <select
+                  name="address.country"
+                  className="select select-bordered w-full"
+                  value={editFormData.address?.country || "United States"}
+                  onChange={handleEditChange}
+                >
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Australia">Australia</option>
+                </select>
+              </div>
             </div>
           </div>
 

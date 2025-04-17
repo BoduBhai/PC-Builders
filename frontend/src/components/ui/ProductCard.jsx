@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCartStore } from "../../stores/useCartStore";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Eye } from "lucide-react";
 import { toast } from "react-hot-toast";
 import ResponsiveImage from "./ResponsiveImage";
 
@@ -10,7 +10,7 @@ const ProductCard = ({ product }) => {
   const [addingToCart, setAddingToCart] = useState(false);
   const cardRef = useRef(null);
 
-  const { addToCart } = useCartStore();
+  const { addToCart, cart } = useCartStore();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,9 +33,32 @@ const ProductCard = ({ product }) => {
     }
   }, []);
 
+  // Check if product is already in cart
+  const isInCart = cart.items.some((item) => item.product._id === product._id);
+
+  // Get current quantity in cart if product exists
+  const existingItem = cart.items.find(
+    (item) => item.product._id === product._id,
+  );
+  const currentQuantity = existingItem ? existingItem.quantity : 0;
+
   const handleAddToCart = async () => {
     if (!product.stock) {
       toast.error("This product is out of stock");
+      return;
+    }
+
+    // If product is already in cart, show a different message
+    if (isInCart) {
+      toast.success(
+        <div>
+          Already in cart ({currentQuantity})<br />
+          <Link to="/cart" className="text-primary underline">
+            View Cart
+          </Link>
+        </div>,
+        { duration: 4000 },
+      );
       return;
     }
 
@@ -89,11 +112,11 @@ const ProductCard = ({ product }) => {
             <span
               className={`text-xl font-bold ${product.onDiscount ? "text-red-500" : ""}`}
             >
-              ${product.onDiscount ? product.discountPrice : product.price}
+              ৳{product.onDiscount ? product.discountPrice : product.price}
             </span>
             {product.onDiscount && (
               <span className="text-sm line-through opacity-60">
-                ${product.price}
+                ৳{product.price}
               </span>
             )}
           </div>
@@ -105,19 +128,25 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="card-actions mt-2">
-          <button
-            className="btn btn-sm btn-success"
-            disabled={!product.stock || addingToCart}
-            onClick={handleAddToCart}
-          >
-            {addingToCart ? (
-              <span className="loading loading-spinner loading-xs"></span>
-            ) : (
-              <>
-                <ShoppingCart size={16} /> Add to Cart
-              </>
-            )}
-          </button>
+          {isInCart ? (
+            <Link to="/cart" className="btn btn-sm btn-outline btn-success">
+              <Eye size={16} /> View in Cart ({currentQuantity})
+            </Link>
+          ) : (
+            <button
+              className="btn btn-sm btn-success"
+              disabled={!product.stock || addingToCart}
+              onClick={handleAddToCart}
+            >
+              {addingToCart ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <>
+                  <ShoppingCart size={16} /> Add to Cart
+                </>
+              )}
+            </button>
+          )}
           <Link
             to={`/products/${product._id}`}
             className="btn btn-sm btn-outline"

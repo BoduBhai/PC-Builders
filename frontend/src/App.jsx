@@ -22,6 +22,7 @@ const DiscountedProductsPage = lazy(
 const ProductDetailsPage = lazy(
   () => import("./pages/products/ProductDetailsPage"),
 );
+const PreBuiltPCPage = lazy(() => import("./pages/products/PreBuiltPCPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const BuildPCPage = lazy(() => import("./pages/BuildPCPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
@@ -92,6 +93,7 @@ function App() {
             element={user ? <ProfilePage /> : <Navigate to="/login" />}
           />
           <Route path="/build-pc" element={<BuildPCPage />} />
+          <Route path="/products/pre-built-pc" element={<PreBuiltPCPage />} />
 
           {/* Checkout and Orders */}
           <Route

@@ -222,10 +222,10 @@ const CartPage = () => {
 
                           <div className="text-right">
                             <div className="text-base font-bold md:text-lg">
-                              ${(price * item.quantity).toFixed(2)}
+                              ৳{(price * item.quantity).toFixed(2)}
                             </div>
                             <div className="text-xs text-gray-500 md:text-sm">
-                              ${price} each
+                              ৳{price} each
                             </div>
                           </div>
                         </div>
@@ -246,7 +246,7 @@ const CartPage = () => {
               <div className="py-4">
                 <div className="flex justify-between pb-2">
                   <span>Items ({cart.totalItems}):</span>
-                  <span>${cart.totalPrice.toFixed(2)}</span>
+                  <span>৳{cart.totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between pb-2">
                   <span>Shipping:</span>
@@ -254,7 +254,7 @@ const CartPage = () => {
                 </div>
                 <div className="flex justify-between pb-2">
                   <span>Tax:</span>
-                  <span>${(cart.totalPrice * 0.1).toFixed(2)}</span>
+                  <span>৳{(cart.totalPrice * 0.1).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -262,7 +262,7 @@ const CartPage = () => {
                 <div className="flex justify-between pb-4">
                   <span className="text-lg font-bold">Order Total:</span>
                   <span className="text-lg font-bold">
-                    ${(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}
+                    ৳{(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}
                   </span>
                 </div>
 
@@ -316,7 +316,7 @@ const CartPage = () => {
                 <div className="mt-2 border-t py-3">
                   <div className="flex justify-between pb-2">
                     <span>Items ({cart.totalItems}):</span>
-                    <span>${cart.totalPrice.toFixed(2)}</span>
+                    <span>৳{cart.totalPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between pb-2">
                     <span>Shipping:</span>
@@ -324,7 +324,7 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between pb-2">
                     <span>Tax:</span>
-                    <span>${(cart.totalPrice * 0.1).toFixed(2)}</span>
+                    <span>৳{(cart.totalPrice * 0.1).toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -332,7 +332,7 @@ const CartPage = () => {
                   <div className="flex justify-between pb-3">
                     <span className="font-bold">Order Total:</span>
                     <span className="font-bold">
-                      ${(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}
+                      ৳{(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}
                     </span>
                   </div>
 

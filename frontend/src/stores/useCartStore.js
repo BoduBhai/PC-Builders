@@ -427,8 +427,6 @@ export const useCartStore = create((set, get) => ({
       set({ loading: true });
 
       try {
-        toast.loading("Clearing cart...", { id: "clearCart" });
-
         // Clear localStorage
         const emptyCart = { items: [], totalPrice: 0, totalItems: 0 };
         saveLocalCart(emptyCart);
@@ -439,12 +437,10 @@ export const useCartStore = create((set, get) => ({
           loading: false,
         });
 
-        toast.success("Cart cleared", { id: "clearCart" });
         return emptyCart;
       } catch (error) {
         set({ loading: false });
         console.error("Error clearing cart:", error);
-        toast.error("Failed to clear cart", { id: "clearCart" });
         return get().cart;
       }
     }
@@ -453,8 +449,6 @@ export const useCartStore = create((set, get) => ({
     set({ loading: true });
 
     try {
-      toast.loading("Clearing cart...", { id: "clearCart" });
-
       const res = await axios.delete("/cart/clear");
 
       set({
@@ -466,20 +460,11 @@ export const useCartStore = create((set, get) => ({
         loading: false,
       });
 
-      toast.success("Cart cleared", { id: "clearCart" });
       return res.data;
     } catch (error) {
       set({ loading: false });
-
       console.error("Error clearing cart:", error);
-
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message, { id: "clearCart" });
-      } else {
-        toast.error("Failed to clear cart", { id: "clearCart" });
-      }
-
-      throw error;
+      return get().cart;
     }
   },
 }));

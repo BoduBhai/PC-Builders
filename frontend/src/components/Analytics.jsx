@@ -80,7 +80,7 @@ const Analytics = () => {
             <div>
               <p className="text-sm opacity-80">Total Revenue</p>
               <h3 className="mt-1 text-3xl font-bold">
-                ${totalRevenue.toLocaleString()}
+                ৳{totalRevenue.toLocaleString()}
               </h3>
               <p className="text-success mt-2 text-xs font-semibold">
                 <TrendingUp className="mr-1 inline" size={14} />+
@@ -215,7 +215,7 @@ const Analytics = () => {
                   </div>
                   <p className="mt-2 text-sm font-medium">{category.name}</p>
                   <p className="text-xs opacity-70">
-                    ${category.value.toLocaleString()}
+                    ৳{category.value.toLocaleString()}
                   </p>
                 </div>
               ))}
@@ -255,7 +255,7 @@ const Analytics = () => {
                         })}
                       </td>
                       <td className="text-xs font-medium">
-                        ${sale.amount.toLocaleString()}
+                        ৳{sale.amount.toLocaleString()}
                       </td>
                     </tr>
                   ))}
@@ -289,7 +289,7 @@ const Analytics = () => {
                       <td className="text-xs">{product.category}</td>
                       <td className="text-xs">{product.sales}</td>
                       <td className="text-xs">
-                        ${product.revenue.toLocaleString()}
+                        ৳{product.revenue.toLocaleString()}
                       </td>
                     </tr>
                   ))}

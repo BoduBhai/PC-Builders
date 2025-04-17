@@ -8,27 +8,41 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { user } = useUserStore();
+  const { user, updateUserProfile } = useUserStore();
   const { cart, loading: cartLoading, fetchCart } = useCartStore();
   const { createOrder, loading: orderLoading } = useOrderStore();
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Form states
   const [shippingAddress, setShippingAddress] = useState({
-    street: user?.address || "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "United States",
+    street: user?.address?.street || "",
+    city: user?.address?.city || "",
+    state: user?.address?.state || "",
+    zipCode: user?.address?.zipCode || "",
+    country: user?.address?.country || "United States",
   });
 
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [formErrors, setFormErrors] = useState({});
+  const [saveAddress, setSaveAddress] = useState(true);
 
   useEffect(() => {
     // Fetch the latest cart data
     fetchCart();
   }, [fetchCart]);
+
+  // Update shipping address when user data changes
+  useEffect(() => {
+    if (user && user.address) {
+      setShippingAddress({
+        street: user.address.street || "",
+        city: user.address.city || "",
+        state: user.address.state || "",
+        zipCode: user.address.zipCode || "",
+        country: user.address.country || "United States",
+      });
+    }
+  }, [user]);
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -55,7 +69,6 @@ const CheckoutPage = () => {
     if (!shippingAddress.zipCode.trim()) {
       errors.zipCode = "Zip code is required";
     }
-    // Removed the zip code format validation since this is a school project
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -87,6 +100,13 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      // Save address to user profile if checkbox is checked
+      if (saveAddress && user) {
+        await updateUserProfile({
+          address: shippingAddress,
+        });
+      }
+
       // Calculate order totals
       const subtotal = cart.totalPrice;
       const tax = subtotal * 0.1; // 10% tax
@@ -105,8 +125,8 @@ const CheckoutPage = () => {
 
       // Submit order
       const order = await createOrder(orderData);
+      await useCartStore.getState().clearCart();
 
-      // Navigate to confirmation page
       navigate(`/order-confirmation/${order._id}`);
     } catch (error) {
       console.error("Checkout error:", error);
@@ -116,7 +136,7 @@ const CheckoutPage = () => {
 
   if (cartLoading) {
     return (
-      <div className="container mx-auto my-10 flex min-h-[60vh] items-center justify-center pt-16">
+      <div className="mx-auto flex h-full w-full items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -236,11 +256,26 @@ const CheckoutPage = () => {
                       name="country"
                       value={shippingAddress.country}
                       onChange={handleInputChange}
-                      //   disabled
                     >
                       <option value="United States">United States</option>
                     </select>
                   </div>
+
+                  {user && (
+                    <div className="form-control md:col-span-2">
+                      <label className="label cursor-pointer justify-start gap-2">
+                        <input
+                          type="checkbox"
+                          className="checkbox border-red-600 checked:bg-red-600 checked:text-white"
+                          checked={saveAddress}
+                          onChange={(e) => setSaveAddress(e.target.checked)}
+                        />
+                        <span className="label-text">
+                          Save this address to my profile
+                        </span>
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -309,11 +344,11 @@ const CheckoutPage = () => {
                   <div className="bg-base-200 mt-6 rounded-lg p-4">
                     <p className="mb-2 font-semibold">Bank Transfer Details:</p>
                     <p className="text-sm">
-                      Account Name: PC Builders Inc.
+                      Account Name: PC Builders Ltd.
                       <br />
                       Account Number: XXXX-XXXX-XXXX-1234
                       <br />
-                      Bank: Example Bank
+                      Bank: Bangladesh Bank
                       <br />
                       Reference: Include your email address as reference
                     </p>
@@ -333,7 +368,7 @@ const CheckoutPage = () => {
               <div className="py-4">
                 <div className="flex justify-between pb-2">
                   <span>Items ({cart.totalItems}):</span>
-                  <span>${cart.totalPrice.toFixed(2)}</span>
+                  <span>৳{cart.totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between pb-2">
                   <span>Shipping:</span>
@@ -341,7 +376,7 @@ const CheckoutPage = () => {
                 </div>
                 <div className="flex justify-between pb-2">
                   <span>Tax (10%):</span>
-                  <span>${(cart.totalPrice * 0.1).toFixed(2)}</span>
+                  <span>৳{(cart.totalPrice * 0.1).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -349,7 +384,7 @@ const CheckoutPage = () => {
                 <div className="flex justify-between pb-4">
                   <span className="text-lg font-bold">Order Total:</span>
                   <span className="text-lg font-bold">
-                    ${(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}
+                    ৳{(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}
                   </span>
                 </div>
 
@@ -365,7 +400,7 @@ const CheckoutPage = () => {
                       Processing...
                     </span>
                   ) : (
-                    `Place Order $${(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}`
+                    `Place Order ৳${(cart.totalPrice + cart.totalPrice * 0.1).toFixed(2)}`
                   )}
                 </button>
               </div>
@@ -390,7 +425,7 @@ const CheckoutPage = () => {
                           {item.product.modelNo}
                         </p>
                         <div className="text-xs text-gray-500">
-                          $
+                          ৳
                           {(item.product.onDiscount
                             ? item.product.discountPrice
                             : item.product.price

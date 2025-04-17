@@ -166,7 +166,7 @@ const OrdersPage = () => {
                     <div>
                       <span className="mr-1">Total:</span>
                       <span className="font-medium">
-                        ${order.total.toFixed(2)}
+                        ৳{order.total.toFixed(2)}
                       </span>
                     </div>
                     <div>

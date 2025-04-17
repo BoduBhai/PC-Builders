@@ -297,15 +297,15 @@ const ProductDetailsPage = () => {
                   {currentProduct?.onDiscount ? (
                     <>
                       <span className="text-primary text-3xl font-bold">
-                        ${currentProduct?.discountPrice.toFixed(2)}
+                        ৳{currentProduct?.discountPrice.toFixed(2)}
                       </span>
                       <span className="text-base-content/50 text-lg line-through">
-                        ${currentProduct?.price.toFixed(2)}
+                        ৳{currentProduct?.price.toFixed(2)}
                       </span>
                     </>
                   ) : (
                     <span className="text-3xl font-bold">
-                      ${currentProduct?.price.toFixed(2)}
+                      ৳{currentProduct?.price.toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -317,7 +317,7 @@ const ProductDetailsPage = () => {
                     </div>
                     <p className="text-sm">
                       <span className="text-success font-medium">
-                        You save ${savingsAmount.toFixed(2)} (
+                        You save ৳{savingsAmount.toFixed(2)} (
                         {savingsPercentage}%)
                       </span>
                       <span className="text-base-content/60 mx-1">•</span>

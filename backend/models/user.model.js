@@ -30,7 +30,26 @@ const userSchema = new mongoose.Schema(
         },
 
         address: {
-            type: String,
+            street: {
+                type: String,
+                default: "",
+            },
+            city: {
+                type: String,
+                default: "",
+            },
+            state: {
+                type: String,
+                default: "",
+            },
+            zipCode: {
+                type: String,
+                default: "",
+            },
+            country: {
+                type: String,
+                default: "United States",
+            },
         },
 
         profilePicture: {

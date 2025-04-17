@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useProductStore } from "../stores/useProductStore";
 import { useCartStore } from "../stores/useCartStore";
-import { ShoppingCart, ChevronRight } from "lucide-react";
+import { ShoppingCart, ChevronRight, ArrowLeft } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 // Import custom components
@@ -19,6 +19,7 @@ import {
 const BuildPCPage = () => {
   const { products, loading, fetchProducts } = useProductStore();
   const { addToCart } = useCartStore();
+  const location = useLocation();
   const [selectedComponents, setSelectedComponents] = useState({
     processor: null,
     motherboard: null,
@@ -40,6 +41,7 @@ const BuildPCPage = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [addingToCart, setAddingToCart] = useState(false);
+  const [fromPreBuilt, setFromPreBuilt] = useState(false);
 
   const { coreComponents, peripherals, accessories } = componentCategories;
 
@@ -77,6 +79,32 @@ const BuildPCPage = () => {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Load pre-built configuration if coming from PreBuiltPCPage
+  useEffect(() => {
+    // Check if we have components data in location state (from pre-built page)
+    if (
+      location.state?.fromPreBuilt &&
+      location.state?.components &&
+      products.length > 0
+    ) {
+      setFromPreBuilt(true);
+      // Apply the pre-built components to our selected components state
+      setSelectedComponents((prevComponents) => ({
+        ...prevComponents,
+        ...location.state.components,
+      }));
+
+      // Show toast notification
+      toast.success(
+        "Pre-built configuration loaded! You can now customize it.",
+        {
+          duration: 4000,
+          icon: "🔧",
+        },
+      );
+    }
+  }, [location.state, products]);
+
   // Update total amount when selected components change
   useEffect(() => {
     let total = 0;
@@ -101,13 +129,39 @@ const BuildPCPage = () => {
 
     setAddingToCart(true);
     try {
+      // Get current cart to check for existing items
+      const currentCart = useCartStore.getState().cart;
+      let addedCount = 0;
+      let skippedCount = 0;
+
       // Add each component to cart sequentially
       for (const [_, component] of Object.entries(selectedComponents)) {
         if (component) {
-          await addToCart(component._id, 1);
+          // Check if this component is already in cart
+          const alreadyInCart = currentCart.items.some(
+            (item) => item.product._id === component._id,
+          );
+
+          if (!alreadyInCart) {
+            await addToCart(component._id, 1);
+            addedCount++;
+          } else {
+            skippedCount++;
+          }
         }
       }
-      toast.success("PC Build added to cart!");
+
+      if (addedCount > 0) {
+        if (skippedCount > 0) {
+          toast.success(
+            `Added ${addedCount} components to cart. ${skippedCount} components were already in your cart.`,
+          );
+        } else {
+          toast.success("PC Build added to cart!");
+        }
+      } else if (skippedCount > 0) {
+        toast.info("All selected components are already in your cart!");
+      }
     } catch (error) {
       toast.error("Failed to add all components to cart.");
       console.error("Error adding build to cart:", error);
@@ -119,6 +173,42 @@ const BuildPCPage = () => {
   return (
     <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4">
+        {fromPreBuilt && (
+          <div className="mb-6">
+            <Link
+              to="/products/pre-built-pc"
+              className="btn btn-outline btn-sm mb-3 flex w-fit items-center gap-2"
+            >
+              <ArrowLeft size={16} />
+              Back to Pre-built Configurations
+            </Link>
+            <div className="alert alert-info shadow-lg">
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 flex-shrink-0 stroke-current"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <h3 className="font-bold">Pre-built configuration loaded!</h3>
+                  <div className="text-xs">
+                    You can now customize this configuration by changing any
+                    component.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="text-success mb-8 text-center">
           <h1 className="mb-2 text-3xl font-bold">
             PC Builder - Build your own PC
@@ -167,7 +257,7 @@ const BuildPCPage = () => {
               <div className="card-body">
                 <h2 className="card-title">Total Amount</h2>
                 <div className="my-4 text-center text-3xl font-bold">
-                  ${totalAmount.toFixed(2)}
+                  ৳{totalAmount.toFixed(2)}
                 </div>
                 <div className="mt-4">
                   <button
@@ -202,7 +292,7 @@ const BuildPCPage = () => {
                 <div className="text-center text-sm">
                   Need help choosing? Check our
                   <Link
-                    to="/products" // TODO: Update to the correct route for pre-built PCs
+                    to="/products/pre-built-pc"
                     className="text-primary mt-1 ml-1 flex items-center justify-center hover:underline"
                   >
                     Pre-built PC Options
