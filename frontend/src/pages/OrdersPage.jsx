@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useOrderStore } from "../stores/useOrderStore";
 import { formatDate } from "../utils/dateUtils";
-import { Clock, Package, CheckCircle, XCircle, FileText } from "lucide-react";
+import {
+  Clock,
+  Package,
+  CheckCircle,
+  XCircle,
+  FileText,
+  AlertTriangle,
+} from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 const OrderStatusBadge = ({ status }) => {
@@ -65,8 +72,9 @@ const PaymentStatusBadge = ({ status }) => {
 };
 
 const OrdersPage = () => {
-  const { orders, loading, fetchUserOrders } = useOrderStore();
+  const { orders, loading, fetchUserOrders, cancelOrder } = useOrderStore();
   const [activeTab, setActiveTab] = useState("all");
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
 
   useEffect(() => {
     fetchUserOrders();
@@ -76,6 +84,19 @@ const OrdersPage = () => {
     if (activeTab === "all") return true;
     return order.orderStatus === activeTab;
   });
+
+  const handleCancelOrder = async (orderId) => {
+    if (window.confirm("Are you sure you want to cancel this order?")) {
+      setCancellingOrderId(orderId);
+      try {
+        await cancelOrder(orderId);
+      } catch (error) {
+        console.error("Error cancelling order:", error);
+      } finally {
+        setCancellingOrderId(null);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -128,6 +149,12 @@ const OrdersPage = () => {
               className={`btn btn-sm ${activeTab === "delivered" ? "btn-primary" : "btn-ghost"}`}
             >
               Delivered
+            </button>
+            <button
+              onClick={() => setActiveTab("cancelled")}
+              className={`btn btn-sm ${activeTab === "cancelled" ? "btn-primary" : "btn-ghost"}`}
+            >
+              Cancelled
             </button>
           </div>
 
@@ -210,6 +237,21 @@ const OrdersPage = () => {
                   >
                     View Details
                   </Link>
+                  {order.orderStatus === "processing" && (
+                    <button
+                      onClick={() => handleCancelOrder(order._id)}
+                      className={`btn btn-error btn-sm w-full md:w-auto ${
+                        cancellingOrderId === order._id ? "loading" : ""
+                      }`}
+                      disabled={cancellingOrderId === order._id}
+                    >
+                      {cancellingOrderId === order._id ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        "Cancel Order"
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

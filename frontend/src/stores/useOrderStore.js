@@ -74,6 +74,41 @@ export const useOrderStore = create((set) => ({
     }
   },
 
+  // Cancel an order (only if it's in processing state)
+  cancelOrder: async (orderId) => {
+    set({ loading: true });
+    try {
+      toast.loading("Cancelling your order...", { id: "cancel-order" });
+      const res = await axios.patch(`/orders/${orderId}/cancel`);
+
+      // Update orders list with the cancelled order
+      set((state) => ({
+        orders: state.orders.map((order) =>
+          order._id === orderId
+            ? { ...order, orderStatus: "cancelled" }
+            : order,
+        ),
+        currentOrder:
+          state.currentOrder?._id === orderId
+            ? { ...state.currentOrder, orderStatus: "cancelled" }
+            : state.currentOrder,
+        loading: false,
+      }));
+
+      toast.success("Order cancelled successfully!", { id: "cancel-order" });
+      return res.data;
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      set({ loading: false });
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Failed to cancel order. Please try again.";
+      toast.error(errorMessage, { id: "cancel-order" });
+      throw error;
+    }
+  },
+
   // Clear current order (used after viewing order confirmation)
   clearCurrentOrder: () => {
     set({ currentOrder: null });

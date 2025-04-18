@@ -34,12 +34,10 @@ export const createOrder = async (req, res) => {
 
             // Check if product exists and has enough stock
             if (!product) {
-                return res
-                    .status(400)
-                    .json({
-                        message:
-                            "One or more products in your cart are no longer available",
-                    });
+                return res.status(400).json({
+                    message:
+                        "One or more products in your cart are no longer available",
+                });
             }
 
             if (product.stock < item.quantity) {
@@ -207,6 +205,55 @@ export const updateOrderStatus = async (req, res) => {
         res.status(200).json(order);
     } catch (error) {
         console.error("Error updating order status:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+// User: Cancel an order
+export const cancelOrder = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { orderId } = req.params;
+
+        const order = await Order.findOne({ _id: orderId, user: userId });
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        // Only allow cancellation if order is in processing state
+        if (order.orderStatus !== "processing") {
+            return res.status(400).json({
+                message:
+                    "Cannot cancel this order as it is already being processed for delivery",
+            });
+        }
+
+        // Update order status to cancelled
+        order.orderStatus = "cancelled";
+
+        // If payment was completed, mark as refunded
+        if (order.paymentStatus === "completed") {
+            order.paymentStatus = "refunded";
+        }
+
+        await order.save();
+
+        // Restore the product stock
+        for (const item of order.items) {
+            await Product.findByIdAndUpdate(item.product, {
+                $inc: { stock: item.quantity },
+            });
+        }
+
+        const updatedOrder = await Order.findById(orderId).populate({
+            path: "items.product",
+            select: "modelNo description image",
+        });
+
+        res.status(200).json(updatedOrder);
+    } catch (error) {
+        console.error("Error cancelling order:", error.message);
         res.status(500).json({ message: "Internal server error" });
     }
 };
