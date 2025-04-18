@@ -83,8 +83,10 @@ const ProductsList = () => {
   };
 
   return (
-    <div className="bg-base-200 container mx-auto mt-10 mb-20 max-w-6xl rounded-lg p-5 shadow-md">
+    <div className="container mx-auto mb-20 max-w-6xl rounded-lg p-5">
       {/* Products Table */}
+      <h2 className="mb-10 text-center text-xl font-bold">Products List</h2>
+
       <ProductTable
         products={products}
         onEditClick={handleEditClick}

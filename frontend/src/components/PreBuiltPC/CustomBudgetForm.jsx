@@ -1,52 +1,118 @@
 import React from "react";
+import { DollarSign, Settings, Cpu } from "lucide-react";
 
 const CustomBudgetForm = ({
   customBudget,
   setCustomBudget,
   generateCustomConfiguration,
   isGeneratingCustomBuild,
+  selectedType,
 }) => {
+  const pcTypeLabels = {
+    gaming: "Gaming PC",
+    productivity: "Workstation PC",
+    regular: "Home/Office PC",
+  };
+
   return (
-    <div className="card bg-base-100 shadow-md">
+    <div className="card from-base-100 to-base-200 border-base-300 border bg-gradient-to-br shadow-lg">
       <div className="card-body">
-        <h3 className="card-title text-lg">Enter Your Budget</h3>
+        <div className="mb-2 flex items-center gap-3">
+          <div className="bg-primary/20 rounded-full p-2">
+            <Settings size={24} className="text-primary" />
+          </div>
+          <h3 className="card-title text-xl">
+            Build Your Custom {pcTypeLabels[selectedType]}
+          </h3>
+        </div>
+
+        <p className="text-base-content/70 mb-6">
+          We'll optimize your PC configuration to get the best performance
+          possible for your exact budget
+        </p>
+
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Budget Amount (৳)</span>
+            <span className="label-text flex items-center font-medium">
+              <Cpu size={16} className="mr-2" />
+              Enter Your Budget Amount
+            </span>
+            <span className="label-text-alt">Range: ৳400 - ৳120000</span>
           </label>
-          <div className="join w-full">
-            <span className="btn btn-neutral join-item no-animation">৳</span>
-            <input
-              type="number"
-              min="400"
-              step="50"
-              value={customBudget}
-              onChange={(e) =>
-                setCustomBudget(Math.max(400, parseInt(e.target.value) || 0))
-              }
-              className="input input-bordered join-item w-full"
-              placeholder="Enter amount in taka"
-            />
-            <button
-              className="btn btn-primary join-item"
-              onClick={generateCustomConfiguration}
-              disabled={isGeneratingCustomBuild}
-            >
-              {isGeneratingCustomBuild ? (
-                <span className="loading loading-spinner loading-sm"></span>
-              ) : (
-                "Build My PC"
-              )}
-            </button>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-grow">
+              <div className="join w-full">
+                <span className="btn btn-neutral join-item no-animation">
+                  ৳
+                </span>
+                <input
+                  type="number"
+                  min="400"
+                  max="120000"
+                  step="50"
+                  value={customBudget}
+                  onChange={(e) =>
+                    setCustomBudget(
+                      Math.max(400, parseInt(e.target.value) || 0),
+                    )
+                  }
+                  className="join-item input input-bordered w-full"
+                  placeholder="Enter amount in taka"
+                />
+                <button
+                  className="btn btn-primary join-item"
+                  onClick={generateCustomConfiguration}
+                  disabled={isGeneratingCustomBuild}
+                >
+                  {isGeneratingCustomBuild ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    <DollarSign size={18} />
+                  )}
+                  {isGeneratingCustomBuild ? "Building..." : "Build My PC"}
+                </button>
+              </div>
+            </div>
           </div>
-          <label className="label">
-            <span className="label-text-alt">Minimum budget ৳400</span>
-            <span className="label-text-alt">Recommended: ৳600-৳3500</span>
-          </label>
+
+          <div className="mt-4">
+            <div className="alert bg-base-300/50 text-sm shadow-sm">
+              <div>
+                <span className="font-semibold">Recommended Budgets:</span>
+                <ul className="mt-1 space-y-1">
+                  <li className="flex justify-between">
+                    <span>Budget Gaming PC:</span>
+                    <span>৳30,000 - ৳50,000</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Mid-Range Gaming PC:</span>
+                    <span>৳50,000 - ৳70,000</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>High-End Gaming PC:</span>
+                    <span>৳70,000 - ৳120,000</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="bg-base-300 h-2.5 w-full rounded-full">
+              <div
+                className="bg-primary h-2.5 rounded-full"
+                style={{
+                  width: `${Math.min(100, (customBudget / 120000) * 100)}%`,
+                }}
+              ></div>
+            </div>
+            <div className="mt-1 flex justify-between text-xs">
+              <span>৳400</span>
+              <span>৳120,000</span>
+            </div>
+          </div>
         </div>
-        <p className="text-sm">
-          We'll build you the best possible PC for your exact budget
-        </p>
       </div>
     </div>
   );

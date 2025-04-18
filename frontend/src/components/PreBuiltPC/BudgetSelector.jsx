@@ -1,5 +1,5 @@
 import React from "react";
-import { Sliders, DollarSign } from "lucide-react";
+import { DollarSign, Coins, Sparkles, Zap } from "lucide-react";
 
 const BudgetSelector = ({
   isCustomBudget,
@@ -9,67 +9,113 @@ const BudgetSelector = ({
   budgetRanges,
   selectedType,
 }) => {
+  // Budget range cards with visual representation
+  const budgetRangeCards = [
+    {
+      id: "budget",
+      name: "Budget",
+      icon: <Coins className="text-amber-500" size={24} />,
+      description: "Affordable and functional",
+    },
+    {
+      id: "midRange",
+      name: "Mid-Range",
+      icon: <Sparkles className="text-blue-500" size={24} />,
+      description: "Balanced performance and value",
+    },
+    {
+      id: "highEnd",
+      name: "High-End",
+      icon: <Zap className="text-purple-500" size={24} />,
+      description: "Premium performance",
+    },
+  ];
+
+  const formatPrice = (price) => {
+    return `৳${price.toLocaleString()}`;
+  };
+
   return (
-    <div className="mb-8">
-      <h2 className="mb-4 text-xl font-semibold">Select Your Budget</h2>
+    <div className="mb-10">
+      <h2 className="mb-6 text-2xl font-bold">Select Your Budget Range</h2>
 
-      <div className="flex flex-col gap-4">
-        {/* Toggle between predefined ranges and custom budget */}
-        <div className="flex flex-wrap gap-4">
-          <button
-            className={`btn ${!isCustomBudget ? "btn-primary" : "btn-outline"}`}
-            onClick={() => setIsCustomBudget(false)}
-          >
-            <Sliders size={16} className="mr-2" />
-            Predefined Ranges
-          </button>
-
-          <button
-            className={`btn ${isCustomBudget ? "btn-primary" : "btn-outline"}`}
-            onClick={() => setIsCustomBudget(true)}
-          >
-            <DollarSign size={16} className="mr-2" />
-            Custom Budget
-          </button>
-        </div>
-
-        {!isCustomBudget && (
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <button
-              className={`btn ${selectedBudgetRange === "budget" ? "btn-primary" : "btn-outline"}`}
-              onClick={() => setSelectedBudgetRange("budget")}
-            >
-              Budget
-              <span className="badge badge-sm ml-1">
-                ৳{budgetRanges[selectedType].budget.minPrice}-৳
-                {budgetRanges[selectedType].budget.maxPrice}
-              </span>
-            </button>
-
-            <button
-              className={`btn ${selectedBudgetRange === "midRange" ? "btn-primary" : "btn-outline"}`}
-              onClick={() => setSelectedBudgetRange("midRange")}
-            >
-              Mid-Range
-              <span className="badge badge-sm ml-1">
-                ৳{budgetRanges[selectedType].midRange.minPrice}-৳
-                {budgetRanges[selectedType].midRange.maxPrice}
-              </span>
-            </button>
-
-            <button
-              className={`btn ${selectedBudgetRange === "highEnd" ? "btn-primary" : "btn-outline"}`}
-              onClick={() => setSelectedBudgetRange("highEnd")}
-            >
-              High-End
-              <span className="badge badge-sm ml-1">
-                ৳{budgetRanges[selectedType].highEnd.minPrice}-৳
-                {budgetRanges[selectedType].highEnd.maxPrice}
-              </span>
-            </button>
+      <div className="mb-6 flex flex-wrap gap-4">
+        <button
+          className={`btn relative px-6 ${
+            !isCustomBudget ? "btn-primary" : "btn-outline"
+          }`}
+          onClick={() => setIsCustomBudget(false)}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Coins size={18} />
+            <span>Preset Budgets</span>
           </div>
-        )}
+        </button>
+
+        <button
+          className={`btn relative px-6 ${
+            isCustomBudget ? "btn-primary" : "btn-outline"
+          }`}
+          onClick={() => setIsCustomBudget(true)}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <DollarSign size={18} />
+            <span>Custom Budget</span>
+          </div>
+        </button>
       </div>
+
+      {!isCustomBudget && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {budgetRangeCards.map((range) => {
+            const budgetInfo = budgetRanges[selectedType][range.id];
+            const isSelected = selectedBudgetRange === range.id;
+
+            return (
+              <div
+                key={range.id}
+                className={`card cursor-pointer transition-all ${
+                  isSelected
+                    ? "from-primary/20 to-base-100 border-primary border-2 bg-gradient-to-br shadow-lg"
+                    : "bg-base-100 shadow hover:shadow-md"
+                }`}
+                onClick={() => setSelectedBudgetRange(range.id)}
+              >
+                <div className="card-body p-5">
+                  <div className="mb-2 flex items-center gap-3">
+                    <div
+                      className={`rounded-full p-2 ${isSelected ? "bg-primary/20" : "bg-base-200"}`}
+                    >
+                      {range.icon}
+                    </div>
+                    <h3 className="text-lg font-bold">{range.name}</h3>
+                  </div>
+
+                  <p className="text-base-content/70 mb-2 text-sm">
+                    {range.description}
+                  </p>
+
+                  <div className="mt-auto">
+                    <div className="text-base-content/60 text-xs">
+                      Price Range:
+                    </div>
+                    <div className="font-medium">
+                      {formatPrice(budgetInfo.minPrice)} -{" "}
+                      {formatPrice(budgetInfo.maxPrice)}
+                    </div>
+                  </div>
+
+                  {isSelected && (
+                    <div className="absolute top-3 right-3">
+                      <div className="badge badge-primary">Selected</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

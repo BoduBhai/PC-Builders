@@ -13,16 +13,9 @@ const UserTable = ({
   onDelete,
 }) => {
   return (
-    <div
-      className="overflow-y-auto"
-      style={{
-        maxHeight: "65vh",
-        scrollbarWidth: "thin",
-        scrollbarColor: "rgba(155, 155, 155, 0.5) transparent",
-      }}
-    >
-      <div className="overflow-x-auto">
-        <table className="table-zebra table-pin-rows table-pin-cols table w-full">
+    <div className="flex h-[65vh] flex-col">
+      <div className="flex-grow overflow-x-auto overflow-y-auto">
+        <table className="table-zebra table-pin-rows table-pin-cols table w-full min-w-[800px]">
           <thead className="bg-base-200">
             <tr>
               <th>User</th>

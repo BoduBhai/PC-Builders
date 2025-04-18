@@ -1,23 +1,86 @@
 // filepath: c:\Users\HP\Desktop\PC-Builders\frontend\src\components\Admin\Orders\OrdersTable.jsx
-import React from "react";
-import { Calendar, Package, CreditCard, BanknoteIcon } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Calendar,
+  Package,
+  CreditCard,
+  BanknoteIcon,
+  Search,
+  Filter,
+  RefreshCw,
+} from "lucide-react";
 import { formatDate } from "../../../utils/dateUtils";
 import LoadingSpinner from "../../LoadingSpinner";
 
 /**
- * Component to display orders table with sorting, filtering and pagination
+ * Component to display orders table with integrated filtering, search, and sorting
  */
-const OrdersTable = ({
-  orders,
-  loading,
-  onViewOrder,
-  searchQuery,
-  selectedStatus,
-  selectedPaymentStatus,
-  setSearchQuery,
-  setSelectedStatus,
-  setSelectedPaymentStatus,
-}) => {
+const OrdersTable = ({ orders, loading, onViewOrder, onRefresh }) => {
+  // State for search and filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("all");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
+  // Apply filters whenever orders or filter values change
+  useEffect(() => {
+    if (!orders) return;
+
+    const filtered = orders.filter((order) => {
+      // Search query filter
+      const searchMatch =
+        searchQuery === "" ||
+        order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (order.user?.email &&
+          order.user.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (order.user?.fname &&
+          order.user.fname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (order.user?.lname &&
+          order.user.lname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (order.user?.fname &&
+          order.user?.lname &&
+          `${order.user.fname} ${order.user.lname}`
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()));
+
+      // Order status filter
+      const statusMatch =
+        selectedStatus === "all" || order.orderStatus === selectedStatus;
+
+      // Payment status filter
+      const paymentStatusMatch =
+        selectedPaymentStatus === "all" ||
+        order.paymentStatus === selectedPaymentStatus;
+
+      return searchMatch && statusMatch && paymentStatusMatch;
+    });
+
+    setFilteredOrders(filtered);
+  }, [orders, searchQuery, selectedStatus, selectedPaymentStatus]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleStatusChange = (e) => {
+    setSelectedStatus(e.target.value);
+  };
+
+  const handlePaymentStatusChange = (e) => {
+    setSelectedPaymentStatus(e.target.value);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setSelectedStatus("all");
+    setSelectedPaymentStatus("all");
+  };
+
+  const toggleFilters = () => {
+    setIsFilterOpen(!isFilterOpen);
+  };
+
   // Status badge color mapping
   const getOrderStatusBadge = (status) => {
     switch (status) {
@@ -63,22 +126,104 @@ const OrdersTable = ({
   };
 
   return (
-    <div className="card bg-base-100 border-base-300 border shadow-xl">
+    <div className="card bg-base-100">
+      <div className="bg-base-300 pb-10 text-center">
+        <h1 className="mb-2 text-3xl font-bold">Order Management</h1>
+        <p className="text-gray-600">View and manage customer orders</p>
+      </div>
       <div className="card-body p-0">
-        <div className="bg-base-200 border-base-300 border-b p-3 text-lg font-semibold">
-          Orders List
+        <div className="bg-base-200 border-base-300 flex flex-col items-center justify-between gap-3 border-b p-3 md:flex-row">
+          {/* Search bar on the left */}
+          <div className="relative flex w-full items-center md:w-auto">
+            <input
+              type="text"
+              placeholder="Search orders by ID or customer..."
+              className="input input-bordered input-sm w-full pr-8"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+            <Search
+              className="absolute top-1/2 right-2 -translate-y-1/2 transform text-gray-400"
+              size={16}
+            />
+          </div>
+
+          {/* Filter and refresh buttons on the right */}
+          <div className="flex w-full justify-end gap-3 md:w-auto">
+            <button
+              className="btn btn-sm btn-outline gap-2"
+              onClick={toggleFilters}
+            >
+              <Filter size={16} />
+              {isFilterOpen ? "Hide Filters" : "Filters"}
+            </button>
+
+            <button
+              className="btn btn-sm btn-primary gap-2"
+              onClick={onRefresh}
+              disabled={loading}
+            >
+              <RefreshCw size={16} />
+              Refresh
+            </button>
+          </div>
         </div>
+
         <div
-          className="overflow-y-auto"
-          style={{
-            maxHeight: "65vh",
-            scrollbarWidth: "thin",
-            scrollbarColor: "rgba(155, 155, 155, 0.5) transparent",
-          }}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isFilterOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
         >
-          <div className="overflow-x-auto">
-            <table className="table-zebra table-pin-rows table-pin-cols table w-full">
-              <thead className="bg-base-200">
+          <div className="bg-base-100 border-base-300 flex flex-col gap-3 border-b p-3 md:flex-row">
+            <div className="form-control w-full md:w-1/3">
+              <label className="label">
+                <span className="label-text font-medium">Order Status</span>
+              </label>
+              <select
+                className="select select-bordered select-sm w-full"
+                value={selectedStatus}
+                onChange={handleStatusChange}
+              >
+                <option value="all">All Statuses</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div className="form-control w-full md:w-1/3">
+              <label className="label">
+                <span className="label-text font-medium">Payment Status</span>
+              </label>
+              <select
+                className="select select-bordered select-sm w-full"
+                value={selectedPaymentStatus}
+                onChange={handlePaymentStatusChange}
+              >
+                <option value="all">All Payments</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+              </select>
+            </div>
+
+            <div className="mb-2 flex w-full items-end md:w-1/3">
+              <button
+                className="btn btn-sm w-full"
+                onClick={handleClearFilters}
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex h-[65vh] flex-col">
+          <div className="flex-grow overflow-x-auto overflow-y-auto">
+            <table className="table-zebra table-pin-rows table-pin-cols table w-full min-w-[900px]">
+              <thead>
                 <tr>
                   <th className="min-w-[110px]">Order ID</th>
                   <th className="min-w-[200px]">Customer</th>
@@ -90,8 +235,8 @@ const OrdersTable = ({
                 </tr>
               </thead>
               <tbody>
-                {orders.length > 0 ? (
-                  orders.map((order) => (
+                {filteredOrders.length > 0 ? (
+                  filteredOrders.map((order) => (
                     <tr key={order._id} className="hover">
                       <td className="font-mono">
                         <div className="flex flex-col">
@@ -168,11 +313,7 @@ const OrdersTable = ({
                           selectedPaymentStatus !== "all" ? (
                             <button
                               className="btn btn-ghost btn-sm mt-2"
-                              onClick={() => {
-                                setSearchQuery("");
-                                setSelectedStatus("all");
-                                setSelectedPaymentStatus("all");
-                              }}
+                              onClick={handleClearFilters}
                             >
                               Clear Filters
                             </button>

@@ -72,14 +72,11 @@ const ProductTable = ({
   };
 
   return (
-    <div className="card bg-base-100 border-base-300 border shadow-xl">
+    <div className="card bg-base-100 border-base-300 rounded-lg border shadow-xl">
       <div className="card-body p-0">
-        <div className="bg-base-200 border-base-300 flex flex-col items-center justify-between gap-3 border-b p-3 md:flex-row">
-          <h2 className="text-lg font-semibold">Products List</h2>
-
-          {/* Search and filter controls */}
-          <div className="flex w-full flex-col items-center gap-3 md:w-auto md:flex-row">
-            <div className="relative flex w-full items-center md:w-auto">
+        <div className="bg-base-200 rounded-t-xl px-2">
+          <div className="flex w-full items-center justify-between py-3">
+            <div className="relative flex w-full md:w-auto">
               <input
                 type="text"
                 placeholder="Search products..."
@@ -94,7 +91,7 @@ const ProductTable = ({
             </div>
 
             <button
-              className="btn btn-sm btn-outline gap-2"
+              className="btn btn-sm btn-outline ml-3 gap-2"
               onClick={toggleFilters}
             >
               <Filter size={16} />
@@ -103,7 +100,6 @@ const ProductTable = ({
           </div>
         </div>
 
-        {/* Filter panel with transition */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
             isFilterOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
@@ -157,18 +153,12 @@ const ProductTable = ({
           </div>
         </div>
 
-        <div
-          className="overflow-y-auto"
-          style={{
-            maxHeight: "65vh",
-            scrollbarWidth: "thin",
-            scrollbarColor: "rgba(155, 155, 155, 0.5) transparent",
-          }}
-        >
-          <div className="overflow-x-auto">
-            <table className="table-zebra table-pin-rows table-pin-cols table w-full">
-              <thead className="bg-base-200">
-                <tr>
+        {/* Table with fixed horizontal scrollbar */}
+        <div className="flex h-[65vh] flex-col">
+          <div className="flex-grow overflow-x-auto overflow-y-auto">
+            <table className="table-zebra table-pin-rows table-pin-cols table w-full min-w-[900px]">
+              <thead>
+                <tr className="">
                   <th className="min-w-[250px]">Product</th>
                   <th className="min-w-[150px]">Price</th>
                   <th className="min-w-[120px]">Stock Count</th>

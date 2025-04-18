@@ -4,6 +4,7 @@ import {
   Users,
   ShoppingCart,
   LayoutDashboard,
+  BarChart4,
 } from "lucide-react";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
@@ -63,49 +64,69 @@ const AdminManagementPage = () => {
   }, [activeTab, fetchProducts, getAllUsers, fetchAllOrders]);
 
   return (
-    <div className="min-h-screen pt-52">
+    <div className="min-h-screen pt-20">
       <div className="container mx-auto px-4">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Management Dashboard</h1>
-          <Link to="/dashboard" className="btn btn-primary">
-            <LayoutDashboard className="mr-2 size-4" />
-            Back to Dashboard
-          </Link>
+        {/* Enhanced Header Section */}
+        <div className="card bg-base-100 border-b-primary mb-8 overflow-hidden border-b">
+          <div className="card-body p-6 md:p-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-3">
+                <BarChart4 className="text-primary size-8 md:size-10" />
+                <h1 className="text-2xl font-extrabold tracking-tight md:text-4xl">
+                  Management Dashboard
+                </h1>
+              </div>
+              <Link
+                to="/dashboard"
+                className="btn btn-sm md:btn-md btn-primary"
+              >
+                <LayoutDashboard className="mr-2 size-4" />
+                Back to Dashboard
+              </Link>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-10 flex justify-center">
-          <div
-            role="tablist"
-            className="tabs tabs-bordered bg-base-300 flex-col gap-5 rounded-md px-5 font-bold sm:flex-row"
-          >
+        {/* Improved Tabs Section */}
+        <div className="flex justify-center">
+          <div className="tabs-boxed bg-base-300 rounded-box flex w-full flex-wrap justify-evenly gap-1 p-2 shadow-md md:gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                className={`tab tab-bordered ${
-                  activeTab === tab.id ? "tab-active" : ""
+                className={`tab tab-lg flex items-center gap-2 font-medium transition-all duration-300 md:font-bold ${
+                  activeTab === tab.id
+                    ? "text-primary border-primary border-b-2"
+                    : "hover:bg-base-200"
                 }`}
                 onClick={() => setActiveTab(tab.id)}
               >
-                <tab.icon className="mr-2 size-4" />
-                {tab.label}
+                <tab.icon
+                  className={`size-4 md:size-5 ${activeTab === tab.id ? "text-primary" : ""}`}
+                />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">
+                  {tab.id === "create" ? "New" : tab.label}
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="bg-base-100 mt-8 rounded-lg p-6 shadow-md">
-          <Suspense
-            fallback={
-              <div className="flex justify-center p-12">
-                <LoadingSpinner size="lg" />
-              </div>
-            }
-          >
-            {activeTab === "create" && <CreateProductForm />}
-            {activeTab === "products" && <ProductsList />}
-            {activeTab === "orders" && <AdminOrdersPage />}
-            {activeTab === "users" && <UsersList />}
-          </Suspense>
+        <div className="card bg-base-300 my-8 rounded-lg shadow-lg">
+          <div className="card-body p-4 md:p-6">
+            <Suspense
+              fallback={
+                <div className="flex justify-center p-12">
+                  <LoadingSpinner size="lg" />
+                </div>
+              }
+            >
+              {activeTab === "create" && <CreateProductForm />}
+              {activeTab === "products" && <ProductsList />}
+              {activeTab === "orders" && <AdminOrdersPage />}
+              {activeTab === "users" && <UsersList />}
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

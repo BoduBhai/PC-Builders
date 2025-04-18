@@ -4,17 +4,12 @@ import { CheckCircle2 } from "lucide-react";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 // Import modularized components
-import OrdersFilterBar from "../../components/Admin/Orders/OrdersFilterBar";
 import OrderDetailsModal from "../../components/Admin/Orders/OrderDetailsModal";
 import OrdersTable from "../../components/Admin/Orders/OrdersTable";
 
 const AdminOrdersPage = () => {
   const { allOrders, fetchAllOrders, updateOrderStatus, loading } =
     useAdminOrderStore();
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("all");
   const [currentOrder, setCurrentOrder] = useState(null);
   const [processingOrderId, setProcessingOrderId] = useState(null);
   const [statusUpdateSuccess, setStatusUpdateSuccess] = useState(null);
@@ -24,42 +19,6 @@ const AdminOrdersPage = () => {
   useEffect(() => {
     fetchAllOrders();
   }, [fetchAllOrders]);
-
-  // Apply filters when orders, search query, or filter selections change
-  useEffect(() => {
-    if (!allOrders) return;
-
-    let results = [...allOrders];
-
-    // Apply search filter if query exists
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      results = results.filter(
-        (order) =>
-          order._id.toLowerCase().includes(query) ||
-          order.user?.email?.toLowerCase().includes(query) ||
-          order.user?.fname?.toLowerCase().includes(query) ||
-          order.user?.lname?.toLowerCase().includes(query) ||
-          `${order.user?.fname} ${order.user?.lname}`
-            .toLowerCase()
-            .includes(query),
-      );
-    }
-
-    // Apply order status filter
-    if (selectedStatus !== "all") {
-      results = results.filter((order) => order.orderStatus === selectedStatus);
-    }
-
-    // Apply payment status filter
-    if (selectedPaymentStatus !== "all") {
-      results = results.filter(
-        (order) => order.paymentStatus === selectedPaymentStatus,
-      );
-    }
-
-    setFilteredOrders(results);
-  }, [allOrders, searchQuery, selectedStatus, selectedPaymentStatus]);
 
   // Clear status update success message after 3 seconds
   useEffect(() => {
@@ -166,12 +125,7 @@ const AdminOrdersPage = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 pt-20">
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold">Order Management</h1>
-        <p className="text-gray-600">View and manage customer orders</p>
-      </div>
-
+    <div className="container mx-auto px-4 py-8">
       {/* Status Update Success Toast */}
       {statusUpdateSuccess && (
         <div className="toast toast-top toast-end">
@@ -182,29 +136,12 @@ const AdminOrdersPage = () => {
         </div>
       )}
 
-      {/* Filters and Search */}
-      <OrdersFilterBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        selectedPaymentStatus={selectedPaymentStatus}
-        setSelectedPaymentStatus={setSelectedPaymentStatus}
-        onRefresh={fetchAllOrders}
-        loading={loading}
-      />
-
-      {/* Orders Table */}
+      {/* Orders Table with integrated filtering */}
       <OrdersTable
-        orders={filteredOrders}
+        orders={allOrders}
         loading={loading}
         onViewOrder={handleViewOrderDetails}
-        searchQuery={searchQuery}
-        selectedStatus={selectedStatus}
-        selectedPaymentStatus={selectedPaymentStatus}
-        setSearchQuery={setSearchQuery}
-        setSelectedStatus={setSelectedStatus}
-        setSelectedPaymentStatus={setSelectedPaymentStatus}
+        onRefresh={fetchAllOrders}
       />
 
       {/* Order Details Modal */}
