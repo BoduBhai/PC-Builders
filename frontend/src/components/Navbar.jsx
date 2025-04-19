@@ -82,6 +82,9 @@ const Navbar = () => {
             <Link to="/build-pc" className="btn btn-ghost btn-sm">
               Build PC
             </Link>
+            <Link to="/contact" className="btn btn-ghost btn-sm">
+              Contact Us
+            </Link>
           </nav>
         </div>
 
@@ -178,6 +181,9 @@ const Navbar = () => {
           </Link>
           <Link to="/build-pc" className="btn btn-ghost justify-start">
             Build PC
+          </Link>
+          <Link to="/contact" className="btn btn-ghost justify-start">
+            Contact Us
           </Link>
           <Link to="/cart" className="btn btn-ghost justify-start">
             Shopping Cart

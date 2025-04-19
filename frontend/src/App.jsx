@@ -31,6 +31,7 @@ const OrderConfirmationPage = lazy(
 );
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
 
 import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
@@ -76,6 +77,7 @@ function App() {
           <Route path="/products/:id" element={<ProductDetailsPage />} />
           <Route path="/category/:categoryName" element={<CategoryPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route
             path="/discounted-products"
             element={<DiscountedProductsPage />}
