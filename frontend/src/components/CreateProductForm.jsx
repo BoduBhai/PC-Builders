@@ -109,8 +109,10 @@ const CreateProductForm = () => {
   };
 
   return (
-    <div className="bg-base-200 container mx-auto mt-10 mb-20 max-w-6xl rounded-lg p-5 shadow-md">
-      <h2 className="text-center text-xl font-bold">Create New Product</h2>
+    <div className="container mx-auto mb-20 max-w-6xl rounded-lg p-5 shadow-md">
+      <h2 className="mb-10 text-center text-3xl font-bold">
+        Create New Product
+      </h2>
 
       {/* Submission feedback alert */}
       {submitFeedback.message && (
@@ -126,7 +128,10 @@ const CreateProductForm = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-base-200 mt-5 space-y-4 rounded-lg p-5 shadow-md"
+      >
         <fieldset className="fieldset text-lg">
           <legend className="fieldset-legend">Category</legend>
           <select

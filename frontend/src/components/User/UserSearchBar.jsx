@@ -7,10 +7,8 @@ const UserSearchBar = ({
   toggleFilters,
 }) => {
   return (
-    <div className="bg-base-200 border-base-300 flex flex-col items-center justify-between gap-3 border-b p-3 md:flex-row">
-      <h2 className="text-lg font-semibold">Users List</h2>
-
-      <div className="flex w-full flex-col items-center gap-3 md:w-auto md:flex-row">
+    <div className="bg-base-200 border-base-300 border-b p-3">
+      <div className="flex items-center justify-between">
         <div className="relative flex w-full items-center md:w-auto">
           <input
             type="text"

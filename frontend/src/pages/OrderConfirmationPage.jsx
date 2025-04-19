@@ -44,11 +44,7 @@ const OrderConfirmationPage = () => {
   }, [fetchOrderById, navigate, orderId, user, clearCart]);
 
   if (loading || !currentOrder) {
-    return (
-      <div className="container mx-auto my-10 flex min-h-[60vh] items-center justify-center pt-16">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" />;
   }
 
   // Format the date

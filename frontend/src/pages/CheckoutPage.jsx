@@ -135,11 +135,7 @@ const CheckoutPage = () => {
   };
 
   if (cartLoading) {
-    return (
-      <div className="mx-auto flex h-full w-full items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" />;
   }
 
   return (

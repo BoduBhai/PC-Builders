@@ -1,4 +1,3 @@
-// filepath: c:\Users\HP\Desktop\PC-Builders\frontend\src\components\Admin\Orders\OrdersTable.jsx
 import React, { useState, useEffect } from "react";
 import {
   Calendar,

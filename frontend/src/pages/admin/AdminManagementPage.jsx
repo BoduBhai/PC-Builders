@@ -113,14 +113,8 @@ const AdminManagementPage = () => {
         </div>
 
         <div className="card bg-base-300 my-8 rounded-lg shadow-lg">
-          <div className="card-body p-4 md:p-6">
-            <Suspense
-              fallback={
-                <div className="flex justify-center p-12">
-                  <LoadingSpinner size="lg" />
-                </div>
-              }
-            >
+          <div className="card-body">
+            <Suspense fallback={<LoadingSpinner size="lg" />}>
               {activeTab === "create" && <CreateProductForm />}
               {activeTab === "products" && <ProductsList />}
               {activeTab === "orders" && <AdminOrdersPage />}

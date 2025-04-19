@@ -117,11 +117,7 @@ const AdminOrdersPage = () => {
 
   // Show loading spinner while initially loading
   if (loading && !allOrders.length) {
-    return (
-      <div className="container mx-auto flex min-h-[70vh] items-center justify-center pt-16">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" />;
   }
 
   return (

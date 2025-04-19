@@ -12,6 +12,19 @@ import {
 import { useAnalyticsStore } from "../stores/useAnalyticsStore";
 import { formatDate } from "../utils/dateUtils";
 import LoadingSpinner from "./LoadingSpinner";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  PieChart as ReChartPie,
+  Pie,
+  Cell,
+} from "recharts";
 
 const Analytics = () => {
   const { analytics, loading, error } = useAnalyticsStore();
@@ -161,34 +174,16 @@ const Analytics = () => {
               <div className="badge badge-primary">Last {timeRange}</div>
             </div>
 
-            {/* Chart Placeholder - In real app use Chart.js or Recharts */}
-            <div className="bg-base-200 flex min-h-52 items-center justify-center rounded-md">
-              <div className="flex flex-col items-center space-y-2 p-4">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-                <p className="text-sm opacity-70">
-                  Monthly sales chart would render here
-                </p>
-
-                <div className="mt-6 w-full max-w-md">
-                  <div className="stat-container flex w-full justify-between">
-                    {monthlySales.slice(0, 6).map((month, i) => (
-                      <div
-                        key={i}
-                        className="relative flex w-8 flex-col items-center"
-                      >
-                        <div
-                          className="bg-primary w-6 rounded-t-sm"
-                          style={{
-                            height: `${(month.value / Math.max(...monthlySales.map((m) => m.value))) * 100}px`,
-                          }}
-                        ></div>
-                        <div className="mt-1 text-xs">{month.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlySales}>
+                <CartesianGrid stroke="#ccc" />
+                <XAxis dataKey="label" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -198,28 +193,44 @@ const Analytics = () => {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="card-title flex items-center">
                 <PieChart className="mr-2" size={20} />
-                Sales by Category
+                Sales
               </h3>
               <div className="badge badge-secondary">Top Categories</div>
             </div>
 
-            {/* Simplified Chart */}
-            <div className="flex flex-wrap justify-evenly gap-2">
-              {salesByCategory.map((category, index) => (
-                <div key={index} className="text-center">
-                  <div
-                    className="radial-progress text-primary"
-                    style={{ "--value": category.percentage, "--size": "8rem" }}
-                  >
-                    {category.percentage}%
-                  </div>
-                  <p className="mt-2 text-sm font-medium">{category.name}</p>
-                  <p className="text-xs opacity-70">
-                    ৳{category.value.toLocaleString()}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <ReChartPie>
+                <Pie
+                  data={salesByCategory.slice(0, 4)}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={0}
+                  outerRadius={90}
+                  paddingAngle={2}
+                  dataKey="value"
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {salesByCategory.slice(0, 4).map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={["#F87171", "#FBBF24", "#34D399", "#60A5FA"][index]}
+                    />
+                  ))}
+                </Pie>
+                <Legend
+                  layout="horizontal"
+                  verticalAlign="bottom"
+                  align="center"
+                  wrapperStyle={{ paddingTop: 20 }}
+                  iconType="circle"
+                  iconSize={10}
+                />
+                <Tooltip />
+              </ReChartPie>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

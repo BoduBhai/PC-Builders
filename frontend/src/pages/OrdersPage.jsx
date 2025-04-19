@@ -99,11 +99,7 @@ const OrdersPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="container mx-auto my-10 flex min-h-[60vh] items-center justify-center pt-16">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" />;
   }
 
   return (

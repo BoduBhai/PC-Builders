@@ -119,58 +119,62 @@ const UsersList = () => {
   };
 
   return (
-    <div className="card bg-base-100 border-base-300 border shadow-xl">
-      <div className="card-body p-0">
-        {/* Search bar component */}
-        <UserSearchBar
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          isFilterOpen={isFilterOpen}
-          toggleFilters={toggleFilters}
-        />
+    <>
+      <h2 className="mt-4 mb-10 text-center text-3xl font-bold">Users List</h2>
+      <div className="card bg-base-100 border-base-300 border shadow-xl">
+        <div className="card-body p-0">
+          {/* Search bar component */}
 
-        {/* Filter panel component */}
-        <UserFilterPanel
-          isFilterOpen={isFilterOpen}
-          selectedRole={selectedRole}
-          onRoleFilterChange={handleRoleFilterChange}
-          onClearFilters={handleClearFilters}
-        />
+          <UserSearchBar
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+            isFilterOpen={isFilterOpen}
+            toggleFilters={toggleFilters}
+          />
 
-        {/* User table component */}
-        <UserTable
-          filteredUsers={filteredUsers}
+          {/* Filter panel component */}
+          <UserFilterPanel
+            isFilterOpen={isFilterOpen}
+            selectedRole={selectedRole}
+            onRoleFilterChange={handleRoleFilterChange}
+            onClearFilters={handleClearFilters}
+          />
+
+          {/* User table component */}
+          <UserTable
+            filteredUsers={filteredUsers}
+            loading={loading}
+            searchTerm={searchTerm}
+            selectedRole={selectedRole}
+            onClearFilters={handleClearFilters}
+            onViewDetails={handleViewDetailsClick}
+            onRoleToggle={handleRoleToggleClick}
+            onDelete={handleDeleteClick}
+          />
+        </div>
+
+        {/* User details view modals */}
+        {users?.map((user) => (
+          <UserDetailsModal key={`details-${user._id}`} user={user} />
+        ))}
+
+        {/* Role change confirmation modal */}
+        <RoleChangeModal
+          userId={roleChangeUserId}
+          users={users}
           loading={loading}
-          searchTerm={searchTerm}
-          selectedRole={selectedRole}
-          onClearFilters={handleClearFilters}
-          onViewDetails={handleViewDetailsClick}
-          onRoleToggle={handleRoleToggleClick}
-          onDelete={handleDeleteClick}
+          onConfirm={confirmRoleChange}
+        />
+
+        {/* Delete confirmation modal */}
+        <DeleteUserModal
+          userId={deleteUserId}
+          users={users}
+          loading={loading}
+          onConfirm={confirmDeleteUser}
         />
       </div>
-
-      {/* User details view modals */}
-      {users?.map((user) => (
-        <UserDetailsModal key={`details-${user._id}`} user={user} />
-      ))}
-
-      {/* Role change confirmation modal */}
-      <RoleChangeModal
-        userId={roleChangeUserId}
-        users={users}
-        loading={loading}
-        onConfirm={confirmRoleChange}
-      />
-
-      {/* Delete confirmation modal */}
-      <DeleteUserModal
-        userId={deleteUserId}
-        users={users}
-        loading={loading}
-        onConfirm={confirmDeleteUser}
-      />
-    </div>
+    </>
   );
 };
 
