@@ -5,6 +5,7 @@ import { useEffect, lazy, Suspense } from "react";
 // Components that are needed immediately
 import Navbar from "./components/Navbar";
 import LoadingSpinner from "./components/LoadingSpinner";
+import Footer from "./components/Footer";
 
 // Lazy loaded components
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -68,79 +69,82 @@ function App() {
   if (checkingAuth) return <LoadingSpinner />;
 
   return (
-    <div className="relative container mx-auto min-h-screen overflow-hidden">
+    <div className="relative flex min-h-screen flex-col">
       <Navbar />
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetailsPage />} />
-          <Route path="/category/:categoryName" element={<CategoryPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route
-            path="/discounted-products"
-            element={<DiscountedProductsPage />}
-          />
-          <Route
-            path="/signup"
-            element={!user ? <SignupPage /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/login"
-            element={!user ? <LoginPage /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/profile"
-            element={user ? <ProfilePage /> : <Navigate to="/login" />}
-          />
-          <Route path="/build-pc" element={<BuildPCPage />} />
-          <Route path="/products/pre-built-pc" element={<PreBuiltPCPage />} />
+      <div className="container mx-auto flex-grow overflow-hidden">
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetailsPage />} />
+            <Route path="/category/:categoryName" element={<CategoryPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route
+              path="/discounted-products"
+              element={<DiscountedProductsPage />}
+            />
+            <Route
+              path="/signup"
+              element={!user ? <SignupPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/login"
+              element={!user ? <LoginPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/profile"
+              element={user ? <ProfilePage /> : <Navigate to="/login" />}
+            />
+            <Route path="/build-pc" element={<BuildPCPage />} />
+            <Route path="/products/pre-built-pc" element={<PreBuiltPCPage />} />
 
-          {/* Checkout and Orders */}
-          <Route
-            path="/checkout"
-            element={user ? <CheckoutPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/order-confirmation/:orderId"
-            element={
-              user ? <OrderConfirmationPage /> : <Navigate to="/login" />
-            }
-          />
-          <Route
-            path="/orders"
-            element={user ? <OrdersPage /> : <Navigate to="/login" />}
-          />
+            {/* Checkout and Orders */}
+            <Route
+              path="/checkout"
+              element={user ? <CheckoutPage /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/order-confirmation/:orderId"
+              element={
+                user ? <OrderConfirmationPage /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/orders"
+              element={user ? <OrdersPage /> : <Navigate to="/login" />}
+            />
 
-          {/* Admin */}
-          <Route
-            path="/dashboard"
-            element={
-              user &&
-              (user?.role === "admin" || user?.role === "superadmin") ? (
-                <AdminDashboard />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/admin/management"
-            element={
-              user &&
-              (user?.role === "admin" || user?.role === "superadmin") ? (
-                <AdminManagementPage />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
+            {/* Admin */}
+            <Route
+              path="/dashboard"
+              element={
+                user &&
+                (user?.role === "admin" || user?.role === "superadmin") ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/admin/management"
+              element={
+                user &&
+                (user?.role === "admin" || user?.role === "superadmin") ? (
+                  <AdminManagementPage />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
 
-          {/* Redirect all other paths to home */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Suspense>
+            {/* Redirect all other paths to home */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
+      </div>
+      <Footer />
       <Toaster />
     </div>
   );

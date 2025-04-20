@@ -1,5 +1,7 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useProductStore } from "../stores/useProductStore";
 import { featuredCategories } from "../utils/constants";
@@ -27,8 +29,17 @@ const ProductCardSkeleton = () => (
 const HomePage = () => {
   // Limit to display only a few products on homepage
   const MAX_HOMEPAGE_PRODUCTS = 6;
+  const INITIAL_CATEGORIES_TO_SHOW = 4; // Initial number of categories to display
+
   const { discountedProducts, fetchDiscountedProducts, loading } =
     useProductStore();
+
+  // State to control expanded categories section
+  const [showAllCategories, setShowAllCategories] = useState(false);
+
+  const toggleCategoriesView = () => {
+    setShowAllCategories(!showAllCategories);
+  };
 
   useEffect(() => {
     fetchDiscountedProducts();
@@ -39,7 +50,7 @@ const HomePage = () => {
   const hasMoreProducts = discountedProducts?.length > MAX_HOMEPAGE_PRODUCTS;
 
   return (
-    <div className="min-h-screen pt-[61px]">
+    <div className="min-h-screen py-16">
       <div className="hero bg-base-200 min-h-[70vh]">
         <div className="hero-content flex-col gap-12 lg:flex-row-reverse">
           <img
@@ -75,36 +86,122 @@ const HomePage = () => {
           <h2 className="mb-12 text-center text-3xl font-bold">
             Popular Categories
           </h2>
+
+          {/* Always visible initial categories */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {featuredCategories.map((category, index) => (
-              <div
-                key={index}
-                className="card bg-base-100 shadow-xl transition-all hover:shadow-2xl"
-              >
-                <figure className="h-48">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="h-full w-full object-cover"
-                    width="300"
-                    height="192"
-                    loading="lazy"
-                  />
-                </figure>
-                <div className="card-body">
-                  <h3 className="card-title">{category.name}</h3>
-                  <p className="text-sm opacity-75">{category.description}</p>
-                  <div className="card-actions mt-4 justify-end">
-                    <Link
-                      to={`/category/${category.name}`}
-                      className="btn btn-sm btn-primary"
-                    >
-                      Browse {category.name}
-                    </Link>
+            {featuredCategories
+              .slice(0, INITIAL_CATEGORIES_TO_SHOW)
+              .map((category, index) => (
+                <div
+                  key={index}
+                  className="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl"
+                >
+                  <figure className="h-48">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="h-full w-full object-cover"
+                      width="300"
+                      height="192"
+                      loading="lazy"
+                    />
+                  </figure>
+                  <div className="card-body">
+                    <h3 className="card-title">{category.name}</h3>
+                    <p className="text-sm opacity-75">{category.description}</p>
+                    <div className="card-actions mt-4 justify-end">
+                      <Link
+                        to={`/category/${category.name}`}
+                        className="btn btn-sm btn-primary"
+                      >
+                        Browse {category.name}
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+          </div>
+
+          {/* Animated expandable categories with Framer Motion */}
+          <AnimatePresence>
+            {showAllCategories && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                  {featuredCategories
+                    .slice(INITIAL_CATEGORIES_TO_SHOW)
+                    .map((category, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: index * 0.1,
+                          ease: "easeOut",
+                        }}
+                        className="card bg-base-100 shadow-xl transition-all hover:shadow-2xl"
+                      >
+                        <figure className="h-48">
+                          <img
+                            src={category.image}
+                            alt={category.name}
+                            className="h-full w-full object-cover"
+                            width="300"
+                            height="192"
+                            loading="lazy"
+                          />
+                        </figure>
+                        <div className="card-body">
+                          <h3 className="card-title">{category.name}</h3>
+                          <p className="text-sm opacity-75">
+                            {category.description}
+                          </p>
+                          <div className="card-actions mt-4 justify-end">
+                            <Link
+                              to={`/category/${category.name}`}
+                              className="btn btn-sm btn-primary"
+                            >
+                              Browse {category.name}
+                            </Link>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="relative mt-8 flex justify-center">
+            <motion.button
+              className="btn btn-outline z-10 flex items-center gap-2 transition-colors duration-300 hover:scale-105"
+              onClick={toggleCategoriesView}
+              initial={false}
+              animate={{ y: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+              }}
+            >
+              {showAllCategories ? (
+                <>
+                  <ChevronUp className="transition-transform duration-300" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="transition-transform duration-300" />
+                  Show More
+                </>
+              )}
+            </motion.button>
           </div>
         </div>
       </div>
@@ -180,58 +277,6 @@ const HomePage = () => {
                 </svg>
               </div>
             </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Promo Section */}
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <div className="card bg-primary text-primary-content">
-              <div className="card-body">
-                <h2 className="card-title text-2xl">Special Discounts!</h2>
-                <p>
-                  Get up to 30% off on selected products. Limited time offer.
-                </p>
-                <div className="card-actions justify-end">
-                  <button className="btn">Shop Now</button>
-                </div>
-              </div>
-            </div>
-            <div className="card bg-secondary text-secondary-content">
-              <div className="card-body">
-                <h2 className="card-title text-2xl">Build & Save</h2>
-                <p>
-                  Buy a complete PC build and get extra 10% discount on your
-                  purchase.
-                </p>
-                <div className="card-actions justify-end">
-                  <button className="btn">Configure Now</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Newsletter Section */}
-      <div className="bg-base-200 py-16">
-        <div className="container mx-auto max-w-3xl px-4">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold">Stay Updated</h2>
-            <p className="mt-2 text-gray-500">
-              Subscribe to our newsletter to get updates on new products and
-              special offers.
-            </p>
-          </div>
-          <div className="flex flex-col gap-4 md:flex-row">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="input input-bordered w-full"
-            />
-            <button className="btn btn-primary">Subscribe</button>
           </div>
         </div>
       </div>
