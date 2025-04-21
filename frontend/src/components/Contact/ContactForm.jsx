@@ -1,7 +1,5 @@
 import { useState } from "react";
 import axios from "../../lib/axios";
-import useForm from "../../hooks/useForm";
-import FormInput from "../../components/ui/forms/FormInput";
 import Button from "../../components/ui/forms/Button";
 
 const ContactForm = () => {
@@ -10,11 +8,30 @@ const ContactForm = () => {
     error: null,
   });
 
-  const initialValues = {
+  const [values, setValues] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues({
+      ...values,
+      [name]: value,
+    });
+
+    // Clear error when field is edited
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: null,
+      });
+    }
   };
 
   const validate = (values) => {
@@ -27,7 +44,30 @@ const ContactForm = () => {
     return errors;
   };
 
-  const submitForm = async (values) => {
+  const resetForm = () => {
+    setValues({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
+    setErrors({});
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate form
+    const validationErrors = validate(values);
+    setErrors(validationErrors);
+
+    // If there are errors, don't submit
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       setStatus({ success: null, error: null });
 
@@ -47,17 +87,10 @@ const ContactForm = () => {
           error.response?.data?.message ||
           "Failed to send message. Please try again later.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
-  const {
-    values,
-    errors,
-    isSubmitting,
-    handleChange,
-    handleSubmit,
-    resetForm,
-  } = useForm(initialValues, submitForm, validate);
 
   // Define icons for inputs
   const userIcon = (
@@ -167,37 +200,74 @@ const ContactForm = () => {
             </div>
           )}
 
-          <FormInput
-            type="text"
-            name="name"
-            value={values.name}
-            onChange={handleChange}
-            placeholder="Your Name"
-            icon={userIcon}
-            required
-            error={errors.name}
-          />
+          <div className="form-control w-full">
+            <label
+              className={`input w-full ${errors.name ? "input-error" : ""}`}
+            >
+              <span className="h-[1em] opacity-50">{userIcon}</span>
+              <input
+                type="text"
+                name="name"
+                value={values.name}
+                onChange={handleChange}
+                placeholder="Your Name"
+                required
+                className="w-full"
+              />
+            </label>
+            {errors.name && (
+              <label className="label">
+                <span className="label-text-alt text-error">{errors.name}</span>
+              </label>
+            )}
+          </div>
 
-          <FormInput
-            type="email"
-            name="email"
-            value={values.email}
-            onChange={handleChange}
-            placeholder="Your Email"
-            icon={emailIcon}
-            required
-            error={errors.email}
-          />
+          <div className="form-control w-full">
+            <label
+              className={`input w-full ${errors.email ? "input-error" : ""}`}
+            >
+              <span className="h-[1em] opacity-50">{emailIcon}</span>
+              <input
+                type="email"
+                name="email"
+                value={values.email}
+                onChange={handleChange}
+                placeholder="Your Email"
+                required
+                className="w-full"
+              />
+            </label>
+            {errors.email && (
+              <label className="label">
+                <span className="label-text-alt text-error">
+                  {errors.email}
+                </span>
+              </label>
+            )}
+          </div>
 
-          <FormInput
-            type="text"
-            name="subject"
-            value={values.subject}
-            onChange={handleChange}
-            placeholder="Subject (Optional)"
-            icon={subjectIcon}
-            error={errors.subject}
-          />
+          <div className="form-control w-full">
+            <label
+              className={`input w-full ${errors.subject ? "input-error" : ""}`}
+            >
+              <span className="h-[1em] opacity-50">{subjectIcon}</span>
+              <input
+                type="text"
+                name="subject"
+                value={values.subject}
+                onChange={handleChange}
+                placeholder="Subject (Optional)"
+                className="w-full"
+              />
+            </label>
+            {errors.subject && (
+              <label className="label">
+                <span className="label-text-alt text-error">
+                  {errors.subject}
+                </span>
+              </label>
+            )}
+          </div>
 
           <div className="form-control w-full">
             <label

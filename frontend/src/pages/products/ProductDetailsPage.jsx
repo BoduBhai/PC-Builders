@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
   ShoppingCart,
-  Heart,
   ChevronRight,
   ChevronLeft,
   Check,
@@ -12,29 +11,13 @@ import { toast } from "react-hot-toast";
 
 import { useProductStore } from "../../stores/useProductStore";
 import { useCartStore } from "../../stores/useCartStore";
-import { useUserStore } from "../../stores/useUserStore";
 import { formatDate } from "../../utils/dateUtils";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 // Lazy load ProductCard component
 const ProductCard = lazy(() => import("../../components/ui/ProductCard"));
 
-// Small skeleton loader for product cards
-const ProductCardSkeleton = () => (
-  <div className="card bg-base-100 animate-pulse shadow-xl">
-    <div className="h-56 bg-gray-300"></div>
-    <div className="card-body">
-      <div className="mb-2 h-4 w-3/4 bg-gray-300"></div>
-      <div className="mb-4 h-4 w-1/2 bg-gray-300"></div>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="h-6 w-1/4 bg-gray-300"></div>
-      </div>
-      <div className="card-actions mt-2 flex gap-2">
-        <div className="h-8 w-24 rounded bg-gray-300"></div>
-      </div>
-    </div>
-  </div>
-);
+import { ProductCardSkeleton } from "../../components/Skeletons/ProductCardSkeleton";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -48,9 +31,7 @@ const ProductDetailsPage = () => {
     similarProducts,
   } = useProductStore();
   const { addToCart } = useCartStore();
-  const { user } = useUserStore();
   const [addingToCart, setAddingToCart] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedTab, setSelectedTab] = useState("description");
   const [sliderPosition, setSliderPosition] = useState(0);
   const [visibleSlides, setVisibleSlides] = useState(4);
@@ -110,21 +91,6 @@ const ProductDetailsPage = () => {
     } finally {
       setAddingToCart(false);
     }
-  };
-
-  const toggleWishlist = () => {
-    if (!user) {
-      toast.error("Please log in to add items to wishlist");
-      navigate("/login");
-      return;
-    }
-
-    setIsWishlisted(!isWishlisted);
-    toast.success(
-      isWishlisted
-        ? "Removed from wishlist"
-        : `${currentProduct?.modelNo} added to wishlist!`,
-    );
   };
 
   const savingsAmount = currentProduct?.onDiscount
@@ -250,26 +216,6 @@ const ProductDetailsPage = () => {
                   alt={currentProduct?.modelNo}
                   className="max-h-[80%] max-w-[80%] object-contain drop-shadow-xl transition-all duration-300 hover:scale-105"
                 />
-
-                {/* Wishlist button placed back on image */}
-                <div className="absolute right-5 bottom-5">
-                  <button
-                    onClick={toggleWishlist}
-                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
-                      isWishlisted
-                        ? "bg-red-500 text-white"
-                        : "bg-base-100/80 backdrop-blur-sm hover:bg-red-100 hover:text-red-500"
-                    }`}
-                    aria-label={
-                      isWishlisted ? "Remove from wishlist" : "Add to wishlist"
-                    }
-                  >
-                    <Heart
-                      size={18}
-                      fill={isWishlisted ? "currentColor" : "none"}
-                    />
-                  </button>
-                </div>
               </div>
             </div>
 

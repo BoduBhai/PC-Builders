@@ -1,12 +1,5 @@
 import { useState } from "react";
 
-/**
- * Custom hook for handling form state and validation
- * @param {Object} initialValues - Initial form values
- * @param {Function} onSubmit - Function to call on form submission
- * @param {Function} validate - Optional validation function
- * @returns {Object} Form utilities including values, errors, handleChange, handleSubmit
- */
 const useForm = (initialValues, onSubmit, validate) => {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});

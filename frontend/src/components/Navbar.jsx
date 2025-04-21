@@ -8,9 +8,9 @@ import ThemeController from "./ThemeCTRL/ThemeController";
 const Navbar = () => {
   const { user, logout } = useUserStore();
   const { cart, initCart, fetchCart } = useCartStore();
-  const location = useLocation();
-  const [isScrolled, setIsScrolled] = useState(false);
+
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const location = useLocation();
 
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
 
@@ -30,20 +30,6 @@ const Navbar = () => {
     }
   }, [location.pathname, fetchCart]);
 
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Close mobile menu when location changes
   useEffect(() => {
     setShowMobileMenu(false);
@@ -54,11 +40,7 @@ const Navbar = () => {
   };
 
   return (
-    <header
-      className={`navbar fixed top-0 right-0 left-0 z-50 py-3 transition-all duration-300 ${
-        isScrolled ? "bg-base-100 shadow-md" : "bg-base-100/80 backdrop-blur-md"
-      }`}
-    >
+    <header className="navbar bg-base-100 fixed top-0 right-0 left-0 z-50 py-3 shadow-md">
       <div className="container mx-auto flex items-center justify-between px-4">
         <div className="flex items-center">
           {/* Mobile menu button */}

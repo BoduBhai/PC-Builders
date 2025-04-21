@@ -1,30 +1,14 @@
 import { useEffect, lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 
 import { useProductStore } from "../stores/useProductStore";
 import { featuredCategories } from "../utils/constants";
 
-const ProductCard = lazy(() => import("../components/ui/ProductCard"));
+import { ProductCardSkeleton } from "../components/Skeletons/ProductCardSkeleton";
 
-// Skeleton loading component for products
-const ProductCardSkeleton = () => (
-  <div className="card bg-base-100 animate-pulse shadow-xl">
-    <div className="h-56 bg-gray-300"></div>
-    <div className="card-body">
-      <div className="mb-2 h-4 w-3/4 bg-gray-300"></div>
-      <div className="mb-4 h-4 w-1/2 bg-gray-300"></div>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="h-6 w-1/4 bg-gray-300"></div>
-      </div>
-      <div className="card-actions mt-2 flex gap-2">
-        <div className="h-8 w-24 rounded bg-gray-300"></div>
-        <div className="h-8 w-24 rounded bg-gray-300"></div>
-      </div>
-    </div>
-  </div>
-);
+const ProductCard = lazy(() => import("../components/ui/ProductCard"));
 
 const HomePage = () => {
   // Limit to display only a few products on homepage
@@ -125,7 +109,7 @@ const HomePage = () => {
           {/* Animated expandable categories with Framer Motion */}
           <AnimatePresence>
             {showAllCategories && (
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
@@ -136,7 +120,7 @@ const HomePage = () => {
                   {featuredCategories
                     .slice(INITIAL_CATEGORIES_TO_SHOW)
                     .map((category, index) => (
-                      <motion.div
+                      <Motion.div
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -171,15 +155,15 @@ const HomePage = () => {
                             </Link>
                           </div>
                         </div>
-                      </motion.div>
+                      </Motion.div>
                     ))}
                 </div>
-              </motion.div>
+              </Motion.div>
             )}
           </AnimatePresence>
 
           <div className="relative mt-8 flex justify-center">
-            <motion.button
+            <Motion.button
               className="btn btn-outline z-10 flex items-center gap-2 transition-colors duration-300 hover:scale-105"
               onClick={toggleCategoriesView}
               initial={false}
@@ -201,7 +185,7 @@ const HomePage = () => {
                   Show More
                 </>
               )}
-            </motion.button>
+            </Motion.button>
           </div>
         </div>
       </div>
