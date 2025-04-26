@@ -32,7 +32,7 @@ const HomePage = () => {
   const hasMoreProducts = discountedProducts?.length > MAX_HOMEPAGE_PRODUCTS;
 
   return (
-    <main className="my-8 min-h-screen md:my-16">
+    <main className="min-h-screen">
       <section className="hero bg-base-200 min-h-[80vh]">
         <div className="hero-content flex-col gap-12 lg:flex-row-reverse">
           <img

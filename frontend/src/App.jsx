@@ -8,7 +8,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import Footer from "./components/Footer";
 
 // Lazy loaded components
-const HomePage = lazy(() => import("./pages/HomePage"));
+const HomePage = lazy(() => import("./pages/Homepage"));
 const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -71,7 +71,7 @@ function App() {
   return (
     <div className="relative flex min-h-screen flex-col">
       <Navbar />
-      <div className="container mx-auto flex-grow overflow-hidden">
+      <div className="container mx-auto mt-28 mb-8 flex-grow overflow-hidden md:mt-30 md:mb-16">
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
