@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   }, [fetchAnalytics]);
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen">
       <div className="card bg-base-100 border-b-primary overflow-hidden border-b">
         <div className="card-body p-6 md:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

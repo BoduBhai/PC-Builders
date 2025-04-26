@@ -185,9 +185,9 @@ const DiscountedProductsPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-16">
+    <main className="min-h-screen">
       {/* Header */}
-      <div className="bg-base-200 py-16">
+      <header className="bg-base-200 py-8 md:py-16">
         <div className="container mx-auto px-4">
           <h1 className="mb-4 text-center text-4xl font-bold">
             Special Offers
@@ -219,9 +219,9 @@ const DiscountedProductsPage = () => {
             </button>
           </form>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <section className="container mx-auto px-4 py-8">
         {/* Filter Toggle Button for Mobile/Tablet - Fixed Position */}
         <button
           onClick={toggleFilters}
@@ -293,7 +293,7 @@ const DiscountedProductsPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row">
+        <section className="flex flex-col lg:flex-row">
           {/* Filters Section */}
           <div
             className={`transform transition-all duration-300 ease-in-out ${
@@ -398,7 +398,7 @@ const DiscountedProductsPage = () => {
             emptyStateMessage="No discounted products found"
             onClearFilters={handleClearFilters}
           />
-        </div>
+        </section>
 
         {/* Pagination */}
         {totalFilteredProducts > 0 && (
@@ -409,7 +409,7 @@ const DiscountedProductsPage = () => {
             loading={loading}
           />
         )}
-      </div>
+      </section>
 
       {/* Scroll to top button */}
       <button
@@ -423,7 +423,7 @@ const DiscountedProductsPage = () => {
       >
         <ChevronUp size={24} />
       </button>
-    </div>
+    </main>
   );
 };
 

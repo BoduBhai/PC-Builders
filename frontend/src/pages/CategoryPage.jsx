@@ -12,8 +12,6 @@ const CategoryPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchParam = searchParams.get("search");
 
-  const { fetchProductsByCategory, products, loading } = useProductStore();
-
   const [searchTerm, setSearchTerm] = useState(searchParam || "");
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
@@ -23,10 +21,7 @@ const CategoryPage = () => {
   const [sortOption, setSortOption] = useState("default");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Fetch products when category changes
-  useEffect(() => {
-    fetchProductsByCategory(categoryName);
-  }, [categoryName, fetchProductsByCategory]);
+  const { fetchProductsByCategory, products, loading } = useProductStore();
 
   // Monitor scroll position for the scroll-to-top button
   useEffect(() => {
@@ -37,6 +32,11 @@ const CategoryPage = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Fetch products when category changes
+  useEffect(() => {
+    fetchProductsByCategory(categoryName);
+  }, [categoryName, fetchProductsByCategory]);
 
   // Update from URL params
   useEffect(() => {
@@ -165,9 +165,9 @@ const CategoryPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-16">
+    <main className="min-h-screen">
       {/* Header */}
-      <div className="bg-base-200 py-8 md:py-16">
+      <header className="bg-base-200 py-8 md:py-16">
         <div className="container mx-auto px-4">
           <h1 className="mb-3 text-center text-3xl font-bold md:mb-4 md:text-4xl">
             {categoryName}
@@ -208,9 +208,9 @@ const CategoryPage = () => {
             </button>
           </form>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-4 md:py-8">
+      <section className="container mx-auto px-4 py-4 md:py-8">
         {/* Filter Toggle Button for Mobile/Tablet - Fixed Position */}
         <button
           onClick={toggleFilters}
@@ -291,7 +291,7 @@ const CategoryPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row">
+        <section className="flex flex-col lg:flex-row">
           {/* Filters Section - Full screen on mobile */}
           <div
             className={`transform transition-all duration-300 ease-in-out ${
@@ -382,7 +382,7 @@ const CategoryPage = () => {
             emptyStateMessage={`No ${categoryName} products found matching your criteria`}
             onClearFilters={handleClearFilters}
           />
-        </div>
+        </section>
 
         {/* Pagination */}
         {totalFilteredProducts > 0 && (
@@ -393,7 +393,7 @@ const CategoryPage = () => {
             loading={loading}
           />
         )}
-      </div>
+      </section>
 
       {/* Scroll to top button */}
       <button
@@ -407,7 +407,7 @@ const CategoryPage = () => {
       >
         <ChevronUp size={24} />
       </button>
-    </div>
+    </main>
   );
 };
 

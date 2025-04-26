@@ -176,9 +176,9 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-16">
+    <main className="min-h-screen">
       {/* Header */}
-      <div className="bg-base-200 py-16">
+      <header className="bg-base-200 py-16">
         <div className="container mx-auto px-4">
           <h1 className="mb-4 text-center text-4xl font-bold">Our Products</h1>
           <p className="mb-8 text-center text-lg">
@@ -208,7 +208,7 @@ const ProductsPage = () => {
             </button>
           </form>
         </div>
-      </div>
+      </header>
 
       <div className="container mx-auto px-4 py-8">
         {/* Filter Toggle Button for Mobile/Tablet - Fixed Position */}
@@ -410,7 +410,7 @@ const ProductsPage = () => {
       >
         <ChevronUp size={24} />
       </button>
-    </div>
+    </main>
   );
 };
 

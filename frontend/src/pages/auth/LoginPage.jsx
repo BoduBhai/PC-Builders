@@ -19,7 +19,7 @@ const LoginPage = () => {
   );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-5">
+    <main className="flex min-h-[80vh] flex-col items-center justify-center gap-5">
       <section className="flex w-full justify-center">
         <form
           onSubmit={handleSubmit}

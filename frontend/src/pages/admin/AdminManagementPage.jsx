@@ -64,7 +64,7 @@ const AdminManagementPage = () => {
   }, [activeTab, fetchProducts, getAllUsers, fetchAllOrders]);
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4">
         {/* Enhanced Header Section */}
         <div className="card bg-base-100 border-b-primary mb-8 overflow-hidden border-b">
