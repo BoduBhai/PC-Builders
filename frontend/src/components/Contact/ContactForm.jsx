@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "../../lib/axios";
 import Button from "../../components/ui/forms/Button";
+import { validateContactForm } from "../../utils/validationUtils";
 
 const ContactForm = () => {
   const [status, setStatus] = useState({
@@ -34,16 +35,6 @@ const ContactForm = () => {
     }
   };
 
-  const validate = (values) => {
-    const errors = {};
-    if (!values.name) errors.name = "Name is required";
-    if (!values.email) errors.email = "Email is required";
-    if (values.email && !/\S+@\S+\.\S+/.test(values.email))
-      errors.email = "Email is invalid";
-    if (!values.message) errors.message = "Message is required";
-    return errors;
-  };
-
   const resetForm = () => {
     setValues({
       name: "",
@@ -58,7 +49,7 @@ const ContactForm = () => {
     e.preventDefault();
 
     // Validate form
-    const validationErrors = validate(values);
+    const validationErrors = validateContactForm(values);
     setErrors(validationErrors);
 
     // If there are errors, don't submit

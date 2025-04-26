@@ -1,24 +1,22 @@
 import { useEffect, lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
+
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
 import { useProductStore } from "../stores/useProductStore";
+
 import { featuredCategories } from "../utils/constants";
-
 import { ProductCardSkeleton } from "../components/Skeletons/ProductCardSkeleton";
-
 const ProductCard = lazy(() => import("../components/ui/ProductCard"));
 
 const HomePage = () => {
-  // Limit to display only a few products on homepage
   const MAX_HOMEPAGE_PRODUCTS = 6;
-  const INITIAL_CATEGORIES_TO_SHOW = 4; // Initial number of categories to display
+  const INITIAL_CATEGORIES_TO_SHOW = 4;
 
   const { discountedProducts, fetchDiscountedProducts, loading } =
     useProductStore();
 
-  // State to control expanded categories section
   const [showAllCategories, setShowAllCategories] = useState(false);
 
   const toggleCategoriesView = () => {
@@ -34,8 +32,8 @@ const HomePage = () => {
   const hasMoreProducts = discountedProducts?.length > MAX_HOMEPAGE_PRODUCTS;
 
   return (
-    <div className="min-h-screen py-16">
-      <div className="hero bg-base-200 min-h-[70vh]">
+    <main className="my-8 min-h-screen md:my-16">
+      <section className="hero bg-base-200 min-h-[80vh]">
         <div className="hero-content flex-col gap-12 lg:flex-row-reverse">
           <img
             src="/hero-image.avif"
@@ -62,16 +60,15 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Categories Section */}
-      <div className="py-16">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold">
             Popular Categories
           </h2>
 
-          {/* Always visible initial categories */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {featuredCategories
               .slice(0, INITIAL_CATEGORIES_TO_SHOW)
@@ -188,10 +185,10 @@ const HomePage = () => {
             </Motion.button>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Discounted Products Section */}
-      <div className="bg-base-200 py-16">
+      <section className="bg-base-200 py-16">
         <div className="container mx-auto px-4">
           <h2 className="mb-6 text-center text-3xl font-bold">
             Special Offers
@@ -263,8 +260,8 @@ const HomePage = () => {
             </Link>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

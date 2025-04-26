@@ -40,7 +40,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="navbar bg-base-100 fixed top-0 right-0 left-0 z-50 py-3 shadow-md">
+    <header className="navbar bg-base-300 z-50 py-3 shadow-md">
       <div className="container mx-auto flex items-center justify-between px-4">
         <div className="flex items-center">
           {/* Mobile menu button */}

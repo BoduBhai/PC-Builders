@@ -7,13 +7,8 @@ export const useUserStore = create((set, get) => ({
   loading: false,
   checkingAuth: true,
 
-  signup: async ({ fname, lname, email, password, confirmPassword, phone }) => {
+  signup: async ({ fname, lname, email, password, phone }) => {
     set({ loading: true });
-
-    if (password !== confirmPassword) {
-      set({ loading: false });
-      return toast.error("Passwords do not match!");
-    }
 
     try {
       const res = await axios.post("/auth/signup", {
@@ -25,7 +20,6 @@ export const useUserStore = create((set, get) => ({
       });
       set({ user: res.data, loading: false });
 
-      // Import dynamically to avoid circular dependency
       const { useCartStore } = await import("./useCartStore");
 
       // Merge local cart with server cart after signup
@@ -45,7 +39,6 @@ export const useUserStore = create((set, get) => ({
       const res = await axios.post("/auth/login", { email, password });
       set({ user: res.data, loading: false });
 
-      // Import dynamically to avoid circular dependency
       const { useCartStore } = await import("./useCartStore");
 
       // Merge local cart with server cart after login
