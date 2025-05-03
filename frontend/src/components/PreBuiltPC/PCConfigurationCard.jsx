@@ -172,7 +172,7 @@ const PCConfigurationCard = ({
           <div className="flex flex-col gap-2 sm:flex-row">
             <Link
               to="/build-pc"
-              className="btn btn-outline flex-1"
+              className="btn btn-outline"
               state={{
                 fromPreBuilt: true,
                 components: components,
@@ -181,7 +181,7 @@ const PCConfigurationCard = ({
               Customize This Build
             </Link>
             <button
-              className="btn btn-primary flex-1"
+              className="btn btn-primary"
               disabled={
                 addingToCartId ===
                 (isCustom ? "custom" : `${pcType}-${budgetRange}`)

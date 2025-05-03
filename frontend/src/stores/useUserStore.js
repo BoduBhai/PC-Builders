@@ -116,7 +116,6 @@ export const useUserStore = create((set, get) => ({
       return response.data;
     } catch (error) {
       set({ loading: false });
-      console.error("Error changing password:", error);
       throw error;
     }
   },

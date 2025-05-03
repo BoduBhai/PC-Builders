@@ -29,13 +29,11 @@ const ProfilePage = () => {
       document.getElementById("edit_profile_modal").close();
       toast.success("Profile updated successfully", { id: "profileUpdate" });
     } catch (error) {
-      // Close the modal first before showing the error toast
       document.getElementById("edit_profile_modal").close();
 
       const errorMsg =
         error?.response?.data?.message || "Failed to update profile";
       toast.error(errorMsg, { id: "profileUpdate" });
-      console.error("Profile update error:", error);
     }
   };
 

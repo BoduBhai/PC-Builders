@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useProductStore } from "../../stores/useProductStore";
 import { useCartStore } from "../../stores/useCartStore";
-import { ArrowLeft, Info, Cpu, Monitor, Wrench } from "lucide-react";
+import {
+  ArrowLeft,
+  Info,
+  Cpu,
+  Monitor,
+  Wrench,
+  ArrowRight,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import {
@@ -140,15 +147,7 @@ const PreBuiltPCPage = () => {
     <main className="min-h-screen">
       <header className="bg-base-200 mb-8 rounded-xl py-8">
         <div className="container mx-auto px-4">
-          <Link
-            to="/build-pc"
-            className="hover:text-primary inline-flex items-center font-medium transition-colors"
-          >
-            <ArrowLeft size={16} className="mr-1" />
-            Back to Products
-          </Link>
-
-          <div className="mt-8 text-center">
+          <div className="text-center">
             <h1 className="from-primary via-secondary to-info mb-2 bg-gradient-to-r bg-clip-text text-4xl font-bold tracking-widest text-transparent uppercase">
               Pre-Built PCs
             </h1>
@@ -284,23 +283,21 @@ const PreBuiltPCPage = () => {
               )
             )}
 
-            <aside className="alert bg-primary/10 my-10 rounded-xl shadow-md">
-              <div className="flex flex-col items-center gap-4 sm:flex-row">
-                <Info size={24} className="text-primary" />
-                <div className="flex-1">
-                  <p className="font-medium">
-                    Looking for more customization? Visit our PC Builder page to
-                    create a completely custom build.
-                  </p>
-                  <p className="text-base-content/70 mt-1 text-sm">
-                    Select each component individually for maximum control over
-                    your PC build
-                  </p>
-                </div>
-                <Link to="/build-pc" className="btn btn-primary min-w-[140px]">
-                  Go to PC Builder
-                </Link>
-              </div>
+            <aside className="mx-auto flex max-w-md flex-col items-center justify-center gap-1 py-4 text-center md:max-w-3xl">
+              <p className="font-medium">
+                Looking for more customization? Visit our PC Builder page to
+                create a completely custom build.
+              </p>
+              <p className="text-base-content/70 mt-1 text-sm">
+                Select each component individually for maximum control over your
+                PC build
+              </p>
+              <Link
+                to="/build-pc"
+                className="text-primary text-md mt-2 flex items-center gap-2 transition-all hover:scale-105 hover:transform"
+              >
+                Go to Builder <ArrowRight className="h-5 w-5" />
+              </Link>
             </aside>
           </div>
         )}

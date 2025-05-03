@@ -87,7 +87,7 @@ const ProductCard = ({ product }) => {
     >
       <figure className="relative h-56 overflow-hidden">
         {product.onDiscount && (
-          <div className="absolute top-0 left-0 z-10 bg-red-500 px-2 py-1 font-semibold text-white">
+          <div className="roun rounded-br-box absolute top-0 left-0 z-10 bg-red-500 px-2 py-1 font-semibold text-white">
             {savingsPercentage}% OFF
           </div>
         )}
@@ -114,10 +114,12 @@ const ProductCard = ({ product }) => {
             >
               ৳{product.onDiscount ? product.discountPrice : product.price}
             </span>
-            {product.onDiscount && (
+            {product.onDiscount ? (
               <span className="text-sm line-through opacity-60">
                 ৳{product.price}
               </span>
+            ) : (
+              <span className="invisible text-sm">Placeholder</span>
             )}
           </div>
           {product.stock > 0 ? (

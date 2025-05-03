@@ -1,7 +1,7 @@
 import { useEffect, lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
 import { useProductStore } from "../stores/useProductStore";
@@ -259,23 +259,9 @@ const HomePage = () => {
                 Can't find what you're looking for?
               </p>
               <div className="text-primary flex items-center gap-2 font-medium">
-                <span>Browse All Products</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="transition-transform duration-300 group-hover:translate-x-1"
-                  aria-hidden="true"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
+                <span>
+                  Browse All Products <ArrowRight className="size-5" />{" "}
+                </span>
               </div>
             </Link>
           </div>
