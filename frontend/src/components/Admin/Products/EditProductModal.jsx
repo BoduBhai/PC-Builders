@@ -5,9 +5,6 @@ import {
   colorOptions,
 } from "../../../utils/constants";
 
-/**
- * Modal component for editing product details
- */
 const EditProductModal = ({ product, loading, onSave }) => {
   const [editFormData, setEditFormData] = useState({
     category: product?.category || "",

@@ -281,9 +281,9 @@ const ProductsPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row">
+        <section className="flex flex-col lg:flex-row">
           {/* Filters Section */}
-          <div
+          <aside
             className={`transform transition-all duration-300 ease-in-out ${
               isFilterOpen
                 ? "max-h-[2000px] opacity-100 lg:w-1/4"
@@ -300,7 +300,7 @@ const ProductsPage = () => {
               </button>
             </div>
 
-            <div className="divide-base-300 mb-6 space-y-4 divide-y">
+            <nav className="divide-base-300 mb-6 space-y-4 divide-y">
               <div className="pb-4">
                 <label className="form-control w-full">
                   <div className="label">
@@ -374,8 +374,8 @@ const ProductsPage = () => {
                   Clear Filters
                 </button>
               </div>
-            </div>
-          </div>
+            </nav>
+          </aside>
 
           {/* Products Grid */}
           <ProductGrid
@@ -385,16 +385,18 @@ const ProductsPage = () => {
             isFilterOpen={isFilterOpen}
             onClearFilters={handleClearFilters}
           />
-        </div>
+        </section>
 
         {/* Pagination */}
         {totalFilteredProducts > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            loading={loading}
-          />
+          <nav aria-label="Pagination" className="pagination">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              loading={loading}
+            />
+          </nav>
         )}
       </div>
 

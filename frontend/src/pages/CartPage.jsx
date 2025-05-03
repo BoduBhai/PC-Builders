@@ -65,7 +65,6 @@ const CartPage = () => {
 
   const handleClearCart = async () => {
     setClearingCart(true);
-
     try {
       await clearCart();
     } catch (error) {
@@ -90,7 +89,7 @@ const CartPage = () => {
 
   if (!loading && (!cart.items || cart.items.length === 0)) {
     return (
-      <div className="container mx-auto my-10 flex min-h-[60vh] flex-col items-center justify-center p-4 pt-16">
+      <section className="flex min-h-[80vh] flex-col items-center justify-center">
         <ShoppingBasket size={64} className="mb-4 text-gray-300" />
         <h2 className="mb-2 text-2xl font-bold">Your cart is empty</h2>
         <p className="mb-6 text-gray-500">
@@ -99,20 +98,21 @@ const CartPage = () => {
         <Link to="/products" className="btn btn-primary">
           Browse Products
         </Link>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="container mx-auto my-10 p-4 pt-16">
+    <main className="min-h-screen">
       <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="lg:w-2/3">
-          <div className="mb-4 flex items-center justify-between md:mb-6">
+        <section className="bg-base-200 rounded-xl p-4 lg:w-2/3">
+          <header className="mb-4 flex items-center justify-between md:mb-6">
             <h1 className="text-2xl font-bold md:text-3xl">Shopping Cart</h1>
             <button
               className="btn btn-sm btn-error"
               onClick={handleClearCart}
               disabled={clearingCart}
+              aria-label="Clear cart contents"
             >
               {clearingCart ? (
                 <span className="loading loading-spinner loading-xs"></span>
@@ -123,7 +123,7 @@ const CartPage = () => {
                 </>
               )}
             </button>
-          </div>
+          </header>
 
           <div className="flex flex-col gap-3 md:gap-4">
             {cart.items.map((item) => {
@@ -133,22 +133,22 @@ const CartPage = () => {
                 : item.product.price;
 
               return (
-                <div
+                <article
                   key={item.product._id}
                   className="card bg-base-100 shadow-md"
                 >
                   <div className="card-body p-3 md:p-4">
                     <div className="flex flex-col items-start gap-3 md:flex-row md:gap-4">
-                      <div className="aspect-square h-20 w-20 overflow-hidden rounded-lg md:h-24 md:w-24">
+                      <figure className="aspect-square h-20 w-20 overflow-hidden rounded-lg md:h-24 md:w-24">
                         <img
                           src={item.product.image}
                           alt={item.product.modelNo}
                           className="h-full w-full object-cover"
                         />
-                      </div>
+                      </figure>
 
                       <div className="flex w-full flex-1 flex-col">
-                        <div className="mb-1 flex items-start justify-between gap-2 md:mb-2">
+                        <header className="mb-1 flex items-start justify-between gap-2 md:mb-2">
                           <Link
                             to={`/products/${item.product._id}`}
                             className="line-clamp-2 text-base font-semibold hover:underline md:text-lg"
@@ -160,28 +160,33 @@ const CartPage = () => {
                             className="btn btn-ghost btn-sm btn-square text-error mt-[-4px]"
                             onClick={() => handleRemoveItem(item.product._id)}
                             disabled={isProcessing}
+                            aria-label={`Remove ${item.product.modelNo} from cart`}
                           >
                             {isProcessing ? (
                               <span className="loading loading-spinner loading-xs"></span>
                             ) : (
-                              <Trash size={16} />
+                              <Trash size={28} />
                             )}
                           </button>
-                        </div>
+                        </header>
 
                         <p className="text-xs text-gray-500 md:text-sm">
                           {item.product.category}
                         </p>
 
                         {item.product.stock < 5 && (
-                          <div className="mt-1 flex items-center gap-1 text-xs text-amber-600 md:text-sm">
+                          <aside className="mt-1 flex items-center gap-1 text-xs text-amber-600 md:text-sm">
                             <AlertTriangle size={14} />
                             <span>Only {item.product.stock} left in stock</span>
-                          </div>
+                          </aside>
                         )}
 
-                        <div className="mt-2 flex items-center justify-between pt-2 md:mt-auto md:pt-4">
-                          <div className="flex items-center">
+                        <footer className="mt-2 flex items-center justify-between pt-2 md:mt-auto md:pt-4">
+                          <div
+                            className="flex items-center"
+                            role="group"
+                            aria-label="Quantity controls"
+                          >
                             <button
                               className="btn btn-xs md:btn-sm"
                               onClick={() =>
@@ -192,6 +197,7 @@ const CartPage = () => {
                                 )
                               }
                               disabled={item.quantity <= 1 || isProcessing}
+                              aria-label="Decrease quantity"
                             >
                               <Minus size={12} className="md:size-4" />
                             </button>
@@ -211,6 +217,7 @@ const CartPage = () => {
                                 item.quantity >= item.product.stock ||
                                 isProcessing
                               }
+                              aria-label="Increase quantity"
                             >
                               <Plus size={12} className="md:size-4" />
                             </button>
@@ -224,37 +231,41 @@ const CartPage = () => {
                               ৳{price} each
                             </div>
                           </div>
-                        </div>
+                        </footer>
                       </div>
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
-        </div>
+        </section>
 
-        <div className="lg:w-1/3">
-          <div className="card bg-base-100 sticky top-20 hidden shadow-xl md:block">
+        <aside className="lg:w-1/3">
+          <section className="card bg-base-200 sticky hidden shadow-xl md:block">
             <div className="card-body">
-              <h2 className="card-title border-b pb-4">Order Summary</h2>
+              <header className="border-b pb-4">
+                <h2 className="card-title">Order Summary</h2>
+              </header>
 
               <div className="py-4">
-                <div className="flex justify-between pb-2">
-                  <span>Items ({cart.totalItems}):</span>
-                  <span>৳{cart.totalPrice.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between pb-2">
-                  <span>Shipping:</span>
-                  <span className="text-success">Free</span>
-                </div>
-                <div className="flex justify-between pb-2">
-                  <span>Tax:</span>
-                  <span>৳{(cart.totalPrice * 0.1).toFixed(2)}</span>
-                </div>
+                <dl className="space-y-2">
+                  <div className="flex justify-between pb-2">
+                    <dt>Items ({cart.totalItems}):</dt>
+                    <dd>৳{cart.totalPrice.toFixed(2)}</dd>
+                  </div>
+                  <div className="flex justify-between pb-2">
+                    <dt>Shipping:</dt>
+                    <dd className="text-success">Free</dd>
+                  </div>
+                  <div className="flex justify-between pb-2">
+                    <dt>Tax:</dt>
+                    <dd>৳{(cart.totalPrice * 0.1).toFixed(2)}</dd>
+                  </div>
+                </dl>
               </div>
 
-              <div className="border-t pt-4">
+              <footer className="border-t pt-4">
                 <div className="flex justify-between pb-4">
                   <span className="text-lg font-bold">Order Total:</span>
                   <span className="text-lg font-bold">
@@ -282,27 +293,37 @@ const CartPage = () => {
                 <Link to="/products" className="btn btn-outline btn-block mt-2">
                   Continue Shopping
                 </Link>
-              </div>
+              </footer>
             </div>
-          </div>
+          </section>
 
-          <div className="card bg-base-100 mb-16 shadow-lg md:hidden">
+          <section className="card bg-base-200 mb-16 shadow-lg md:hidden">
             <div className="card-body p-4">
-              <div
+              <header
                 className="flex cursor-pointer items-center justify-between"
                 onClick={() => setIsOrderSummaryOpen(!isOrderSummaryOpen)}
+                aria-expanded={isOrderSummaryOpen}
+                aria-controls="mobile-order-summary"
               >
                 <h2 className="card-title">Order Summary</h2>
-                <button className="btn btn-sm btn-ghost btn-circle">
+                <button
+                  className="btn btn-sm btn-ghost btn-circle"
+                  aria-label={
+                    isOrderSummaryOpen
+                      ? "Collapse order summary"
+                      : "Expand order summary"
+                  }
+                >
                   {isOrderSummaryOpen ? (
                     <ChevronUp size={18} />
                   ) : (
                     <ChevronDown size={18} />
                   )}
                 </button>
-              </div>
+              </header>
 
               <div
+                id="mobile-order-summary"
                 className={`overflow-hidden transition-all duration-300 ${
                   isOrderSummaryOpen
                     ? "max-h-[300px] opacity-100"
@@ -310,21 +331,23 @@ const CartPage = () => {
                 }`}
               >
                 <div className="mt-2 border-t py-3">
-                  <div className="flex justify-between pb-2">
-                    <span>Items ({cart.totalItems}):</span>
-                    <span>৳{cart.totalPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between pb-2">
-                    <span>Shipping:</span>
-                    <span className="text-success">Free</span>
-                  </div>
-                  <div className="flex justify-between pb-2">
-                    <span>Tax:</span>
-                    <span>৳{(cart.totalPrice * 0.1).toFixed(2)}</span>
-                  </div>
+                  <dl className="space-y-2">
+                    <div className="flex justify-between pb-2">
+                      <dt>Items ({cart.totalItems}):</dt>
+                      <dd>৳{cart.totalPrice.toFixed(2)}</dd>
+                    </div>
+                    <div className="flex justify-between pb-2">
+                      <dt>Shipping:</dt>
+                      <dd className="text-success">Free</dd>
+                    </div>
+                    <div className="flex justify-between pb-2">
+                      <dt>Tax:</dt>
+                      <dd>৳{(cart.totalPrice * 0.1).toFixed(2)}</dd>
+                    </div>
+                  </dl>
                 </div>
 
-                <div className="border-t pt-3">
+                <footer className="border-t pt-3">
                   <div className="flex justify-between pb-3">
                     <span className="font-bold">Order Total:</span>
                     <span className="font-bold">
@@ -332,7 +355,7 @@ const CartPage = () => {
                     </span>
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <nav className="flex flex-col gap-2">
                     {!user ? (
                       <button
                         className="btn btn-primary btn-sm w-full"
@@ -356,14 +379,14 @@ const CartPage = () => {
                     >
                       Continue Shopping
                     </Link>
-                  </div>
-                </div>
+                  </nav>
+                </footer>
               </div>
             </div>
-          </div>
-        </div>
+          </section>
+        </aside>
       </div>
-    </div>
+    </main>
   );
 };
 

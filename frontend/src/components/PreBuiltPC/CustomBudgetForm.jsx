@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, Settings, Cpu } from "lucide-react";
+import { Settings, Cpu } from "lucide-react";
 
 const CustomBudgetForm = ({
   customBudget,
@@ -13,6 +13,8 @@ const CustomBudgetForm = ({
     productivity: "Workstation PC",
     regular: "Home/Office PC",
   };
+
+  // TODO : A lot of fixes needed
 
   return (
     <div className="card from-base-100 to-base-200 border-base-300 border bg-gradient-to-br shadow-lg">
@@ -37,7 +39,7 @@ const CustomBudgetForm = ({
               <Cpu size={16} className="mr-2" />
               Enter Your Budget Amount
             </span>
-            <span className="label-text-alt">Range: ৳400 - ৳120000</span>
+            <span className="label-text-alt">Range starts from ৳25000 </span>
           </label>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -48,13 +50,12 @@ const CustomBudgetForm = ({
                 </span>
                 <input
                   type="number"
-                  min="400"
-                  max="120000"
+                  min="25000"
                   step="50"
                   value={customBudget}
                   onChange={(e) =>
                     setCustomBudget(
-                      Math.max(400, parseInt(e.target.value) || 0),
+                      Math.max(25000, parseInt(e.target.value) || 0),
                     )
                   }
                   className="join-item input input-bordered w-full"
@@ -68,7 +69,7 @@ const CustomBudgetForm = ({
                   {isGeneratingCustomBuild ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
-                    <DollarSign size={18} />
+                    <span className="font-bold">৳</span>
                   )}
                   {isGeneratingCustomBuild ? "Building..." : "Build My PC"}
                 </button>

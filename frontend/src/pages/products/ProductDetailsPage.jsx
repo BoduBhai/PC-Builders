@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ShoppingCart,
   ChevronRight,
   ChevronLeft,
   Check,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -35,6 +38,7 @@ const ProductDetailsPage = () => {
   const [selectedTab, setSelectedTab] = useState("description");
   const [sliderPosition, setSliderPosition] = useState(0);
   const [visibleSlides, setVisibleSlides] = useState(4);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -127,12 +131,22 @@ const ProductDetailsPage = () => {
     setSliderPosition(Math.min(maxPosition, sliderPosition + 1));
   };
 
+  const handleSlideClick = (index) => {
+    const itemWidth = sliderRef.current.clientWidth / visibleSlides;
+    sliderRef.current.scrollTo({
+      left: itemWidth * visibleSlides * index,
+      behavior: "smooth",
+    });
+    setSliderPosition(index);
+  };
+
   if (loading) return <LoadingSpinner />;
 
   if (!currentProduct)
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 pt-[70px]">
+      <main className="flex min-h-[70vh] flex-col items-center justify-center px-4 pt-[70px]">
         <div className="bg-base-200 mb-6 flex h-20 w-20 items-center justify-center rounded-full">
+          // TODO: Replace with a proper icon or image
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-10 w-10 opacity-40"
@@ -155,7 +169,7 @@ const ProductDetailsPage = () => {
         <Link to="/products" className="btn btn-primary">
           Browse Products
         </Link>
-      </div>
+      </main>
     );
 
   const hasEnoughSimilarProducts = similarProducts.length > visibleSlides;
@@ -163,8 +177,8 @@ const ProductDetailsPage = () => {
   return (
     <main className="container mx-auto min-h-screen px-4">
       {/* Back button and breadcrumb navigation */}
-      <div className="mb-6">
-        <nav className="mb-4 flex text-sm">
+      <nav className="mb-6" aria-label="Breadcrumb">
+        <div className="mb-4 flex text-sm">
           <Link to="/" className="text-base-content/60 hover:text-primary">
             Home
           </Link>
@@ -186,7 +200,7 @@ const ProductDetailsPage = () => {
           <span className="max-w-[200px] truncate font-medium">
             {currentProduct.modelNo}
           </span>
-        </nav>
+        </div>
 
         <Link
           to="/products"
@@ -197,14 +211,14 @@ const ProductDetailsPage = () => {
           </span>
           Back to Products
         </Link>
-      </div>
+      </nav>
 
       <section className="mb-16 grid grid-cols-1 gap-12 lg:grid-cols-12">
         {/* Product image - 5 columns */}
-        <div className="lg:col-span-5">
-          <div className="from-base-200 to-base-300 relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br">
+        <figure className="lg:col-span-5">
+          <div className="bg-base-200 relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl">
             {currentProduct?.onDiscount && (
-              <div className="bg-primary text-primary-content absolute top-5 left-5 rounded-full px-4 py-1.5 text-sm font-bold shadow-lg">
+              <div className="absolute top-5 left-5 z-30 rounded-full bg-red-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg">
                 {savingsPercentage}% OFF
               </div>
             )}
@@ -214,24 +228,25 @@ const ProductDetailsPage = () => {
               className="max-h-[80%] max-w-[80%] object-contain drop-shadow-xl transition-all duration-300 hover:scale-105"
             />
           </div>
-        </div>
+        </figure>
 
         {/* Product details - 7 columns */}
-        <div className="bg-base-200 space-y-8 rounded-2xl p-4 lg:col-span-7">
+        <article className="bg-base-200 space-y-8 rounded-2xl p-4 lg:col-span-7">
           {/* Product header */}
+          <header>
+            <div className="mb-2 flex items-center gap-3">
+              <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
+                {currentProduct?.category}
+              </span>
+              <span className="bg-base-200 rounded-full px-3 py-1 text-sm font-medium">
+                {currentProduct?.brand}
+              </span>
+            </div>
 
-          <div className="mb-2 flex items-center gap-3">
-            <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-              {currentProduct?.category}
-            </span>
-            <span className="bg-base-200 rounded-full px-3 py-1 text-sm font-medium">
-              {currentProduct?.brand}
-            </span>
-          </div>
-
-          <h1 className="mb-3 text-3xl font-bold tracking-tight">
-            {currentProduct?.modelNo}
-          </h1>
+            <h1 className="mb-3 text-3xl font-bold tracking-tight">
+              {currentProduct?.modelNo}
+            </h1>
+          </header>
 
           {/* Price and stock section */}
           <div className="bg-base-100 border-base-200 rounded-2xl border p-6 shadow-sm">
@@ -302,6 +317,9 @@ const ProductDetailsPage = () => {
                   } `}
                   disabled={!currentProduct?.stock || addingToCart}
                   onClick={handleAddToCart}
+                  aria-label={
+                    addingToCart ? "Adding to cart..." : "Add to cart"
+                  }
                 >
                   {addingToCart ? (
                     <span className="flex items-center justify-center gap-1.5">
@@ -318,13 +336,17 @@ const ProductDetailsPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </article>
       </section>
 
       {/* Full-width Description and Specs tabs */}
-      <div className="mb-16">
+      <section className="mb-16">
         <div className="border-base-200 mb-8 border-b">
-          <div className="flex gap-8">
+          <div
+            className="flex gap-8"
+            role="tablist"
+            aria-label="Product information"
+          >
             <button
               className={`px-1 pb-4 font-medium transition-colors ${
                 selectedTab === "description"
@@ -332,6 +354,10 @@ const ProductDetailsPage = () => {
                   : "text-base-content/60 hover:text-base-content"
               }`}
               onClick={() => setSelectedTab("description")}
+              role="tab"
+              aria-selected={selectedTab === "description"}
+              aria-controls="description-panel"
+              id="description-tab"
             >
               Description
             </button>
@@ -342,6 +368,10 @@ const ProductDetailsPage = () => {
                   : "text-base-content/60 hover:text-base-content"
               }`}
               onClick={() => setSelectedTab("specs")}
+              role="tab"
+              aria-selected={selectedTab === "specs"}
+              aria-controls="specs-panel"
+              id="specs-tab"
             >
               Specifications
             </button>
@@ -349,76 +379,148 @@ const ProductDetailsPage = () => {
         </div>
 
         <div className="bg-base-200 min-h-[200px] rounded-xl p-6">
-          {selectedTab === "description" && (
-            <div className="prose max-w-none">
-              <p className="text-lg leading-relaxed whitespace-pre-wrap">
-                {currentProduct?.description ||
-                  "No description available for this product."}
-              </p>
-            </div>
-          )}
+          <div
+            id="description-panel"
+            role="tabpanel"
+            aria-labelledby="description-tab"
+            className={selectedTab === "description" ? "" : "hidden"}
+          >
+            {selectedTab === "description" && (
+              <div className="prose max-w-none">
+                <p
+                  className={`text-lg leading-relaxed ${!showFullDescription ? "line-clamp-3" : ""}`}
+                >
+                  {currentProduct?.description ||
+                    "No description available for this product."}
+                </p>
 
-          {selectedTab === "specs" && (
-            <div className="grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-3">
-              <div>
-                <h3 className="text-base-content/50 mb-2 text-sm uppercase">
-                  Category
-                </h3>
-                <p className="font-medium">{currentProduct?.category}</p>
+                <AnimatePresence>
+                  {showFullDescription && (
+                    <Motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <p className="text-lg leading-relaxed whitespace-pre-wrap">
+                        {currentProduct?.description}
+                      </p>
+                    </Motion.div>
+                  )}
+                </AnimatePresence>
+
+                {currentProduct?.description &&
+                  currentProduct.description.length > 150 && (
+                    <div className="relative mt-4">
+                      <Motion.button
+                        className="btn btn-ghost hover:text-primary z-10 flex items-center gap-2"
+                        onClick={() =>
+                          setShowFullDescription(!showFullDescription)
+                        }
+                        initial={false}
+                        animate={{ y: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                        aria-expanded={showFullDescription}
+                        aria-controls="expandable-description"
+                      >
+                        {showFullDescription ? (
+                          <>
+                            <ChevronUp className="transition-transform duration-300" />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="transition-transform duration-300" />
+                            Show More
+                          </>
+                        )}
+                      </Motion.button>
+                    </div>
+                  )}
               </div>
+            )}
+          </div>
 
-              <div>
-                <h3 className="text-base-content/50 mb-2 text-sm uppercase">
-                  Brand
-                </h3>
-                <p className="font-medium">{currentProduct?.brand || "N/A"}</p>
-              </div>
-
-              {currentProduct?.color && (
+          <div
+            id="specs-panel"
+            role="tabpanel"
+            aria-labelledby="specs-tab"
+            className={selectedTab === "specs" ? "" : "hidden"}
+          >
+            {selectedTab === "specs" && (
+              <dl className="grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-3">
                 <div>
-                  <h3 className="text-base-content/50 mb-2 text-sm uppercase">
-                    Color
-                  </h3>
-                  <p className="flex items-center gap-2 font-medium">
-                    <span
-                      className="h-4 w-4 rounded-full bg-current"
-                      style={{ color: currentProduct.color.toLowerCase() }}
-                    ></span>
-                    {currentProduct.color}
-                  </p>
+                  <dt className="text-base-content/50 mb-2 text-sm uppercase">
+                    Category
+                  </dt>
+                  <dd className="font-medium">{currentProduct?.category}</dd>
                 </div>
-              )}
 
-              <div>
-                <h3 className="text-base-content/50 mb-2 text-sm uppercase">
-                  Stock
-                </h3>
-                <p className="font-medium">{currentProduct?.stock} units</p>
-              </div>
+                <div>
+                  <dt className="text-base-content/50 mb-2 text-sm uppercase">
+                    Brand
+                  </dt>
+                  <dd className="font-medium">
+                    {currentProduct?.brand || "N/A"}
+                  </dd>
+                </div>
 
-              <div>
-                <h3 className="text-base-content/50 mb-2 text-sm uppercase">
-                  Model
-                </h3>
-                <p className="font-medium">{currentProduct?.modelNo}</p>
-              </div>
-            </div>
-          )}
+                {currentProduct?.color && (
+                  <div>
+                    <dt className="text-base-content/50 mb-2 text-sm uppercase">
+                      Color
+                    </dt>
+                    <dd className="flex items-center gap-2 font-medium">
+                      <span
+                        className="h-4 w-4 rounded-full bg-current"
+                        style={{ color: currentProduct.color.toLowerCase() }}
+                      ></span>
+                      {currentProduct.color}
+                    </dd>
+                  </div>
+                )}
+
+                <div>
+                  <dt className="text-base-content/50 mb-2 text-sm uppercase">
+                    Stock
+                  </dt>
+                  <dd className="font-medium">{currentProduct?.stock} units</dd>
+                </div>
+
+                <div>
+                  <dt className="text-base-content/50 mb-2 text-sm uppercase">
+                    Model
+                  </dt>
+                  <dd className="font-medium">{currentProduct?.modelNo}</dd>
+                </div>
+              </dl>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Similar Products Section with slider */}
       {similarProducts && similarProducts.length > 0 && (
         <section className="bg-base-200 mt-16 rounded-2xl p-4">
-          <div className="mb-8 flex items-center justify-between">
+          <header className="mb-8 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Similar Products</h2>
 
             {hasEnoughSimilarProducts && (
-              <div className="flex gap-2">
+              <div
+                className="flex gap-2"
+                role="navigation"
+                aria-label="Similar products navigation"
+              >
                 <button
                   onClick={scrollLeft}
                   className="btn btn-circle btn-sm border-base-300 bg-base-100 hover:bg-primary hover:text-primary-content hover:border-primary border transition-colors"
                   disabled={sliderPosition === 0}
+                  aria-label="Previous products"
                 >
                   <ChevronLeft size={20} strokeWidth={2.5} />
                 </button>
@@ -429,12 +531,13 @@ const ProductDetailsPage = () => {
                     sliderPosition >=
                     Math.ceil(similarProducts.length / visibleSlides) - 1
                   }
+                  aria-label="Next products"
                 >
                   <ChevronRight size={20} strokeWidth={2.5} />
                 </button>
               </div>
             )}
-          </div>
+          </header>
 
           <div className="relative overflow-hidden">
             <div
@@ -446,6 +549,8 @@ const ProductDetailsPage = () => {
                 msOverflowStyle: "none",
                 scrollbarWidth: "none",
               }}
+              role="region"
+              aria-label="Similar products carousel"
             >
               {similarProducts.map((product) => (
                 <div
@@ -463,7 +568,10 @@ const ProductDetailsPage = () => {
 
           {/* Mobile indicator dots for small screens */}
           {similarProducts.length > 1 && (
-            <div className="mt-4 flex justify-center gap-1 lg:hidden">
+            <nav
+              className="mt-4 flex justify-center gap-1 lg:hidden"
+              aria-label="Slider pagination"
+            >
               {Array.from({
                 length: Math.ceil(similarProducts.length / visibleSlides),
               }).map((_, i) => (
@@ -472,9 +580,19 @@ const ProductDetailsPage = () => {
                   className={`h-2 w-2 rounded-full transition-colors ${
                     i === sliderPosition ? "bg-primary" : "bg-base-300"
                   }`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Go to slide ${i + 1}`}
+                  aria-current={i === sliderPosition ? "true" : "false"}
+                  onClick={() => handleSlideClick(i)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleSlideClick(i);
+                    }
+                  }}
                 />
               ))}
-            </div>
+            </nav>
           )}
         </section>
       )}

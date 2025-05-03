@@ -37,9 +37,11 @@ const BudgetSelector = ({
 
   return (
     <div className="mb-10">
-      <h2 className="mb-6 text-2xl font-bold">Select Your Budget Range</h2>
+      <h2 className="mb-6 text-center text-2xl font-bold">
+        Select Your Budget Range
+      </h2>
 
-      <div className="mb-6 flex flex-wrap gap-4">
+      <div className="mb-6 flex justify-center gap-4">
         <button
           className={`btn relative px-6 ${
             !isCustomBudget ? "btn-primary" : "btn-outline"
@@ -59,7 +61,7 @@ const BudgetSelector = ({
           onClick={() => setIsCustomBudget(true)}
         >
           <div className="flex items-center justify-center gap-2">
-            <DollarSign size={18} />
+            <span className="font-bold">৳</span>
             <span>Custom Budget</span>
           </div>
         </button>

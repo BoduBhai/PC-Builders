@@ -33,18 +33,26 @@ const HomePage = () => {
 
   return (
     <main className="min-h-screen">
-      <section className="hero bg-base-200 min-h-[80vh]">
+      {/* Hero Section */}
+      <section
+        className="hero bg-base-200 min-h-[80vh]"
+        aria-labelledby="hero-heading"
+      >
         <div className="hero-content flex-col gap-12 lg:flex-row-reverse">
-          <img
-            src="/hero-image.avif"
-            className="max-w-sm rounded-lg shadow-2xl"
-            alt="PC Build"
-            width="384"
-            height="288"
-            loading="eager"
-          />
-          <div>
-            <h1 className="text-5xl font-bold">Build Your Dream PC Today!</h1>
+          <figure>
+            <img
+              src="/hero-image.avif"
+              className="max-w-sm rounded-lg shadow-2xl"
+              alt="Custom PC Build Showcase"
+              width="384"
+              height="288"
+              loading="eager"
+            />
+          </figure>
+          <article>
+            <h1 id="hero-heading" className="text-5xl font-bold">
+              Build Your Dream PC Today!
+            </h1>
             <p className="py-6">
               Get started with the best components for your custom PC build.
               From high-performance gaming rigs to professional workstations, we
@@ -58,14 +66,17 @@ const HomePage = () => {
                 <button className="btn btn-outline">Build a PC</button>
               </Link>
             </div>
-          </div>
+          </article>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-16">
+      <section className="py-16" aria-labelledby="categories-heading">
         <div className="container mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold">
+          <h2
+            id="categories-heading"
+            className="mb-12 text-center text-3xl font-bold"
+          >
             Popular Categories
           </h2>
 
@@ -73,7 +84,7 @@ const HomePage = () => {
             {featuredCategories
               .slice(0, INITIAL_CATEGORIES_TO_SHOW)
               .map((category, index) => (
-                <div
+                <article
                   key={index}
                   className="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl"
                 >
@@ -99,7 +110,7 @@ const HomePage = () => {
                       </Link>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
           </div>
 
@@ -117,7 +128,7 @@ const HomePage = () => {
                   {featuredCategories
                     .slice(INITIAL_CATEGORIES_TO_SHOW)
                     .map((category, index) => (
-                      <Motion.div
+                      <Motion.article
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -152,7 +163,7 @@ const HomePage = () => {
                             </Link>
                           </div>
                         </div>
-                      </Motion.div>
+                      </Motion.article>
                     ))}
                 </div>
               </Motion.div>
@@ -170,6 +181,8 @@ const HomePage = () => {
                 stiffness: 300,
                 damping: 30,
               }}
+              aria-expanded={showAllCategories}
+              aria-controls="expandable-categories"
             >
               {showAllCategories ? (
                 <>
@@ -188,9 +201,15 @@ const HomePage = () => {
       </section>
 
       {/* Discounted Products Section */}
-      <section className="bg-base-200 py-16">
+      <section
+        className="bg-base-200 py-16"
+        aria-labelledby="special-offers-heading"
+      >
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-center text-3xl font-bold">
+          <h2
+            id="special-offers-heading"
+            className="mb-6 text-center text-3xl font-bold"
+          >
             Special Offers
           </h2>
           <p className="mb-8 text-center text-lg">
@@ -252,6 +271,7 @@ const HomePage = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
                 >
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                   <polyline points="12 5 19 12 12 19"></polyline>

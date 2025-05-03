@@ -1,8 +1,5 @@
 import React from "react";
 
-/**
- * Modal component for applying or removing product discounts
- */
 const DiscountModal = ({ product, loading, onApplyDiscount }) => {
   const formatDate = (date) => {
     return date ? new Date(date).toISOString().split("T")[0] : "";

@@ -8,12 +8,13 @@ const ComponentSection = ({
   getComponentImage,
   getComponentName,
   showComponentModal,
+  onRemoveComponent,
   requiredComponents = [],
 }) => {
   return (
-    <div className="card bg-base-100 mb-6 shadow-lg">
+    <div className="card bg-base-200 mb-6 shadow-lg">
       <div className="card-body">
-        <h2 className="card-title bg-base-200 -mx-6 -mt-6 p-4 text-lg font-semibold tracking-wide uppercase">
+        <h2 className="card-title bg-base-300 -mx-6 -mt-6 rounded-xl p-4 text-lg font-semibold tracking-wide uppercase">
           {title}
         </h2>
         <div className="mt-4">
@@ -26,6 +27,7 @@ const ComponentSection = ({
               getComponentImage={getComponentImage}
               getComponentName={getComponentName}
               showComponentModal={showComponentModal}
+              onRemoveComponent={onRemoveComponent}
             />
           ))}
         </div>

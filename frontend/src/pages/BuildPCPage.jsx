@@ -66,6 +66,17 @@ const BuildPCPage = () => {
     setActiveModal(null);
   }, []);
 
+  // Handle component removal
+  const handleComponentRemove = useCallback((componentType) => {
+    setSelectedComponents((prev) => ({
+      ...prev,
+      [componentType]: null,
+    }));
+    toast.success(
+      `Removed ${getComponentName(componentType)} from your build.`,
+    );
+  }, []);
+
   // Use our custom hook to filter products
   const filteredProducts = useComponentFilter(
     products,
@@ -74,38 +85,35 @@ const BuildPCPage = () => {
     getCategoryForComponentType,
   );
 
-  // Fetch products when component mounts
+  const selectedProductIdsMap = React.useMemo(() => {
+    const map = {};
+    Object.values(selectedComponents)
+      .filter((component) => component !== null)
+      .forEach((component) => {
+        map[component._id] = true;
+      });
+    return map;
+  }, [selectedComponents]);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
   // Load pre-built configuration if coming from PreBuiltPCPage
   useEffect(() => {
-    // Check if we have components data in location state (from pre-built page)
     if (
       location.state?.fromPreBuilt &&
       location.state?.components &&
       products.length > 0
     ) {
       setFromPreBuilt(true);
-      // Apply the pre-built components to our selected components state
       setSelectedComponents((prevComponents) => ({
         ...prevComponents,
         ...location.state.components,
       }));
-
-      // Show toast notification
-      toast.success(
-        "Pre-built configuration loaded! You can now customize it.",
-        {
-          duration: 4000,
-          icon: "🔧",
-        },
-      );
     }
   }, [location.state, products]);
 
-  // Update total amount when selected components change
   useEffect(() => {
     let total = 0;
     Object.values(selectedComponents).forEach((component) => {
@@ -171,10 +179,10 @@ const BuildPCPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
+    <main className="min-h-screen">
       <div className="container mx-auto px-4">
         {fromPreBuilt && (
-          <div className="mb-6">
+          <section className="mb-6">
             <Link
               to="/products/pre-built-pc"
               className="btn btn-outline btn-sm mb-3 flex w-fit items-center gap-2"
@@ -182,44 +190,29 @@ const BuildPCPage = () => {
               <ArrowLeft size={16} />
               Back to Pre-built Configurations
             </Link>
-            <div className="alert alert-info shadow-lg">
-              <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 flex-shrink-0 stroke-current"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <div>
-                  <h3 className="font-bold">Pre-built configuration loaded!</h3>
-                  <div className="text-xs">
-                    You can now customize this configuration by changing any
-                    component.
-                  </div>
-                </div>
+            <div className="alert alert-info flex flex-col shadow-lg">
+              <h2 className="text-xl font-bold">
+                Pre-built configuration loaded!
+              </h2>
+              <div className="text-xs">
+                You can now customize this configuration by changing any
+                component.
               </div>
             </div>
-          </div>
+          </section>
         )}
 
-        <div className="text-success mb-8 text-center">
-          <h1 className="mb-2 text-3xl font-bold">
-            PC Builder - Build your own PC
+        <header className="mb-8 text-center">
+          <h1 className="from-primary via-secondary to-info mb-2 bg-gradient-to-r bg-clip-text text-4xl font-bold tracking-widest text-transparent">
+            BUILD YOUR OWN PC
           </h1>
-          <p className="text-success/70">
+          <p className="text-primary text-md">
             Select components to create your custom PC build
           </p>
-        </div>
+        </header>
 
         <div className="flex flex-col gap-6 lg:flex-row">
-          <div className="lg:w-3/4">
+          <section className="lg:w-3/4">
             {/* Core Components Section */}
             <ComponentSection
               title="Core Components"
@@ -228,6 +221,7 @@ const BuildPCPage = () => {
               getComponentImage={getComponentImage}
               getComponentName={getComponentName}
               showComponentModal={showComponentModal}
+              onRemoveComponent={handleComponentRemove}
               requiredComponents={["processor", "motherboard"]}
             />
 
@@ -239,6 +233,7 @@ const BuildPCPage = () => {
               getComponentImage={getComponentImage}
               getComponentName={getComponentName}
               showComponentModal={showComponentModal}
+              onRemoveComponent={handleComponentRemove}
             />
 
             {/* Accessories Section */}
@@ -249,17 +244,18 @@ const BuildPCPage = () => {
               getComponentImage={getComponentImage}
               getComponentName={getComponentName}
               showComponentModal={showComponentModal}
+              onRemoveComponent={handleComponentRemove}
             />
-          </div>
+          </section>
 
-          <div className="lg:w-1/4">
-            <div className="card bg-base-100 sticky top-20 shadow-lg">
+          <aside className="lg:w-1/4">
+            <div className="card bg-base-200 sticky top-20 shadow-lg">
               <div className="card-body">
                 <h2 className="card-title">Total Amount</h2>
                 <div className="my-4 text-center text-3xl font-bold">
                   ৳{totalAmount.toFixed(2)}
                 </div>
-                <div className="mt-4">
+                <nav className="mt-4">
                   <button
                     className="btn btn-primary btn-block flex items-center justify-center gap-2"
                     disabled={
@@ -287,9 +283,9 @@ const BuildPCPage = () => {
                   >
                     Browse More Components
                   </Link>
-                </div>
+                </nav>
                 <div className="divider">OR</div>
-                <div className="text-center text-sm">
+                <footer className="text-center text-sm">
                   Need help choosing? Check our
                   <Link
                     to="/products/pre-built-pc"
@@ -298,7 +294,7 @@ const BuildPCPage = () => {
                     Pre-built PC Options
                     <ChevronRight size={16} />
                   </Link>
-                </div>
+                </footer>
 
                 {(!selectedComponents.processor ||
                   !selectedComponents.motherboard) && (
@@ -327,7 +323,7 @@ const BuildPCPage = () => {
                 )}
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
 
@@ -341,8 +337,10 @@ const BuildPCPage = () => {
         getComponentName={getComponentName}
         filteredProducts={filteredProducts}
         handleComponentSelect={handleComponentSelect}
+        selectedProductIdsMap={selectedProductIdsMap}
+        onRemoveComponent={handleComponentRemove}
       />
-    </div>
+    </main>
   );
 };
 

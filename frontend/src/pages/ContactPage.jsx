@@ -2,9 +2,9 @@ import ContactForm from "../components/Contact/ContactForm";
 
 const ContactPage = () => {
   return (
-    <div className="container mx-auto py-8">
+    <main className="container mx-auto">
       <ContactForm />
-    </div>
+    </main>
   );
 };
 

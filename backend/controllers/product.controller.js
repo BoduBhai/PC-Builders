@@ -143,6 +143,9 @@ export const updateProduct = async (req, res) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
+        // Update Redis cache for discounted products
+        await updatedDiscountedProductCache();
+
         res.status(200).json(updatedProduct);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -169,16 +172,16 @@ export const deleteProduct = async (req, res) => {
         }
 
         await Product.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Product deleted successfully" });
 
-        // TODO : Delete from Redis cache
+        // Update Redis cache for discounted products
+        await updatedDiscountedProductCache();
+
+        res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
         console.error("Error deleting product:", error.message);
         res.status(500).json({ message: "Internal server error" });
     }
 };
-
-// TODO : A lot of updates need to be done here
 
 async function updatedDiscountedProductCache() {
     try {

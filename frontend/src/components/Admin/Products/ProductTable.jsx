@@ -3,9 +3,6 @@ import { Trash, Package, Search, Filter } from "lucide-react";
 import LoadingSpinner from "../../LoadingSpinner";
 import { categoryOptions, brandOptions } from "../../../utils/constants";
 
-/**
- * Component to display products table with similar styling to OrdersTable
- */
 const ProductTable = ({
   products,
   loading,

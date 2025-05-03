@@ -200,6 +200,7 @@ const DiscountedProductsPage = () => {
           <form
             onSubmit={handleSearchSubmit}
             className="bg-base-100 mx-auto mb-8 flex max-w-2xl items-center rounded-lg px-3 shadow-md transition-all duration-300 focus-within:shadow-lg"
+            role="search"
           >
             <Search className="mr-2 size-5 text-gray-500" />
             <input
@@ -208,12 +209,14 @@ const DiscountedProductsPage = () => {
               className="input flex-1 border-0 focus:outline-none"
               value={searchTerm}
               onChange={handleSearchChange}
+              aria-label="Search for products"
             />
             <button
               type="button"
               className="btn btn-circle btn-ghost btn-sm"
               onClick={toggleFilters}
               aria-label="Toggle filters"
+              aria-expanded={isFilterOpen}
             >
               <SlidersHorizontal className="size-5" />
             </button>
@@ -226,6 +229,8 @@ const DiscountedProductsPage = () => {
         <button
           onClick={toggleFilters}
           className="btn btn-primary btn-sm fixed bottom-6 left-6 z-30 flex gap-2 shadow-lg md:hidden"
+          aria-label="Toggle filters"
+          aria-expanded={isFilterOpen}
         >
           <Filter size={16} />
           {isFilterOpen ? "Hide Filters" : "Show Filters"}
@@ -237,6 +242,7 @@ const DiscountedProductsPage = () => {
             <button
               onClick={toggleFilters}
               className="btn btn-sm hidden items-center gap-2 md:flex"
+              aria-expanded={isFilterOpen}
             >
               {isFilterOpen ? (
                 <>
@@ -266,6 +272,7 @@ const DiscountedProductsPage = () => {
                 className="select select-bordered select-sm"
                 value={sortOption}
                 onChange={handleSortChange}
+                aria-label="Sort products by"
               >
                 <option value="default">Default sorting</option>
                 <option value="price_low">Price: Low to High</option>
@@ -284,6 +291,7 @@ const DiscountedProductsPage = () => {
                 className="select select-bordered select-sm"
                 value={itemsPerPage}
                 onChange={handlePerPageChange}
+                aria-label="Products per page"
               >
                 <option value={4}>4</option>
                 <option value={8}>8</option>
@@ -293,20 +301,22 @@ const DiscountedProductsPage = () => {
           </div>
         </div>
 
-        <section className="flex flex-col lg:flex-row">
+        <div className="flex flex-col lg:flex-row">
           {/* Filters Section */}
-          <div
+          <aside
             className={`transform transition-all duration-300 ease-in-out ${
               isFilterOpen
                 ? "max-h-[2000px] opacity-100 lg:w-1/4"
                 : "max-h-0 overflow-hidden opacity-0 lg:max-h-0 lg:w-0 lg:overflow-hidden lg:opacity-0"
             } bg-base-100 rounded-box sticky top-20 z-10 h-fit p-4 shadow-md`}
+            aria-hidden={!isFilterOpen}
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-bold">Filters</h2>
               <button
                 className="btn btn-circle btn-ghost btn-sm"
                 onClick={toggleFilters}
+                aria-label="Close filters"
               >
                 <X className="size-5" />
               </button>
@@ -322,6 +332,7 @@ const DiscountedProductsPage = () => {
                     className="select select-bordered w-full"
                     value={selectedCategory}
                     onChange={handleCategoryChange}
+                    aria-label="Filter by category"
                   >
                     <option value="All">All Categories</option>
                     {categoryOptions.map((category) => (
@@ -342,6 +353,7 @@ const DiscountedProductsPage = () => {
                     className="select select-bordered w-full"
                     value={selectedBrand}
                     onChange={handleBrandChange}
+                    aria-label="Filter by brand"
                   >
                     <option value="All">All Brands</option>
                     {brandOptions.map((brand) => (
@@ -365,6 +377,7 @@ const DiscountedProductsPage = () => {
                     className="input input-bordered w-full"
                     value={priceRange.min}
                     onChange={handlePriceChange}
+                    aria-label="Minimum price"
                   />
                   <span>-</span>
                   <input
@@ -374,6 +387,7 @@ const DiscountedProductsPage = () => {
                     className="input input-bordered w-full"
                     value={priceRange.max}
                     onChange={handlePriceChange}
+                    aria-label="Maximum price"
                   />
                 </div>
               </div>
@@ -387,9 +401,8 @@ const DiscountedProductsPage = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </aside>
 
-          {/* Products Grid */}
           <ProductGrid
             products={currentProducts}
             loading={loading}
@@ -398,20 +411,20 @@ const DiscountedProductsPage = () => {
             emptyStateMessage="No discounted products found"
             onClearFilters={handleClearFilters}
           />
-        </section>
+        </div>
 
-        {/* Pagination */}
         {totalFilteredProducts > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            loading={loading}
-          />
+          <nav aria-label="Pagination" className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              loading={loading}
+            />
+          </nav>
         )}
       </section>
 
-      {/* Scroll to top button */}
       <button
         className={`btn btn-circle btn-primary fixed right-6 bottom-6 shadow-lg transition-all duration-300 ${
           showScrollTop

@@ -175,14 +175,29 @@ export const updateProfile = async (req, res) => {
 
         // Handle structured address update
         if (updateData.address) {
-            // If address is coming as a string, convert it to the street field
             if (typeof updateData.address === "string") {
                 updateData.address = {
                     ...currentUser.address,
                     street: updateData.address,
                 };
             }
-            // If it's an object with street, city, etc. - use as is
+        }
+
+        // Handle structured phone update
+        if (updateData.phone) {
+            const phoneExists = await User.findOne({
+                phone: updateData.phone,
+                _id: { $ne: id },
+            });
+
+            if (phoneExists) {
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "Phone number already registered with another account",
+                    });
+            }
         }
 
         const user = await User.findByIdAndUpdate(

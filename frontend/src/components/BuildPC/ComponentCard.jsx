@@ -1,5 +1,3 @@
-import React from "react";
-
 const ComponentCard = ({
   componentType,
   selected,
@@ -16,7 +14,7 @@ const ComponentCard = ({
           alt={componentType}
           className="h-12 w-12 object-contain"
           onError={(e) => {
-            e.target.src = "/accessories.avif"; // Fallback image
+            e.target.src = "/accessories.avif";
           }}
         />
       </div>
@@ -29,12 +27,23 @@ const ComponentCard = ({
           {selected ? selected.modelNo : "No component selected"}
         </div>
       </div>
-      <button
-        onClick={() => showComponentModal(componentType)}
-        className={selected ? "btn btn-secondary" : "btn btn-primary"}
-      >
-        {selected ? "Change" : "Choose"}
-      </button>
+      {selected ? (
+        <div>
+          <button
+            onClick={() => showComponentModal(componentType)}
+            className="btn btn-secondary"
+          >
+            Change
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => showComponentModal(componentType)}
+          className="btn btn-primary"
+        >
+          Choose
+        </button>
+      )}
     </div>
   );
 };

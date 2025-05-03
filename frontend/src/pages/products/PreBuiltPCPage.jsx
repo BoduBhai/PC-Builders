@@ -11,7 +11,6 @@ import {
 } from "../../components/BuildPC/componentUtils";
 
 // Import modularized components
-import PCTypeSelector from "../../components/PreBuiltPC/PCTypeSelector";
 import BudgetSelector from "../../components/PreBuiltPC/BudgetSelector";
 import CustomBudgetForm from "../../components/PreBuiltPC/CustomBudgetForm";
 import PCConfigurationCard from "../../components/PreBuiltPC/PCConfigurationCard";
@@ -138,12 +137,11 @@ const PreBuiltPCPage = () => {
   };
 
   return (
-    <div className="min-h-screen pb-16">
-      {/* Hero Section with gradient background */}
-      <div className="from-base-300 to-base-100 mb-8 bg-gradient-to-b pt-24 pb-16">
+    <main className="min-h-screen">
+      <header className="bg-base-200 mb-8 rounded-xl py-8">
         <div className="container mx-auto px-4">
           <Link
-            to="/products"
+            to="/build-pc"
             className="hover:text-primary inline-flex items-center font-medium transition-colors"
           >
             <ArrowLeft size={16} className="mr-1" />
@@ -151,8 +149,8 @@ const PreBuiltPCPage = () => {
           </Link>
 
           <div className="mt-8 text-center">
-            <h1 className="from-primary to-secondary bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
-              Pre-Built PC Configurations
+            <h1 className="from-primary via-secondary to-info mb-2 bg-gradient-to-r bg-clip-text text-4xl font-bold tracking-widest text-transparent uppercase">
+              Pre-Built PCs
             </h1>
             <p className="text-base-content/70 mx-auto mt-3 max-w-2xl text-lg">
               Choose from our professionally designed custom PC builds based on
@@ -162,7 +160,7 @@ const PreBuiltPCPage = () => {
 
           <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-6 md:grid-cols-3">
             {Object.entries(typeDescriptions).map(([type, description]) => (
-              <div
+              <article
                 key={type}
                 className={`card bg-base-100 cursor-pointer shadow-lg transition-all hover:shadow-xl ${
                   selectedType === type ? "border-primary border-2" : ""
@@ -178,13 +176,13 @@ const PreBuiltPCPage = () => {
                   </h2>
                   <p className="text-base-content/70 text-sm">{description}</p>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4">
+      <section className="bg-base-200 mx-auto rounded-xl px-4 py-8">
         {/* Budget Selector Component */}
         <BudgetSelector
           isCustomBudget={isCustomBudget}
@@ -197,7 +195,11 @@ const PreBuiltPCPage = () => {
 
         {/* Configuration Display Section */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
+          <div
+            className="flex flex-col items-center justify-center py-16"
+            aria-live="polite"
+            aria-busy="true"
+          >
             <LoadingSpinner size="lg" />
             <p className="text-base-content/70 mt-4">
               Generating optimal configurations...
@@ -263,7 +265,11 @@ const PreBuiltPCPage = () => {
               </div>
             ) : (
               !isCustomBudget && (
-                <div className="py-16 text-center">
+                <div
+                  className="py-16 text-center"
+                  role="alert"
+                  aria-live="polite"
+                >
                   <div className="mb-6 flex justify-center">
                     <Info size={64} className="text-base-content/30" />
                   </div>
@@ -278,7 +284,7 @@ const PreBuiltPCPage = () => {
               )
             )}
 
-            <div className="alert bg-primary/10 my-10 rounded-xl shadow-md">
+            <aside className="alert bg-primary/10 my-10 rounded-xl shadow-md">
               <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Info size={24} className="text-primary" />
                 <div className="flex-1">
@@ -295,11 +301,11 @@ const PreBuiltPCPage = () => {
                   Go to PC Builder
                 </Link>
               </div>
-            </div>
+            </aside>
           </div>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
