@@ -250,21 +250,17 @@ const HomePage = () => {
             </div>
           )}
 
-          <div className="mt-12 flex justify-center">
+          <aside className="mx-auto mt-4 flex flex-col items-center justify-center gap-1 text-center">
+            <p className="text-lg font-medium tracking-widest">
+              Can't find what you're looking for?
+            </p>
             <Link
               to="/products"
-              className="group flex flex-col items-center transition-all hover:scale-105 hover:transform"
+              className="text-primary text-md flex items-center gap-2 transition-all hover:scale-105 hover:transform"
             >
-              <p className="mb-3 text-center text-lg">
-                Can't find what you're looking for?
-              </p>
-              <div className="text-primary flex items-center gap-2 font-medium">
-                <span>
-                  Browse All Products <ArrowRight className="size-5" />{" "}
-                </span>
-              </div>
+              Browse All Products <ArrowRight className="h-5 w-5" />
             </Link>
-          </div>
+          </aside>
         </div>
       </section>
     </main>
