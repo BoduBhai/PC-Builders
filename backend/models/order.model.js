@@ -45,7 +45,7 @@ const orderSchema = new mongoose.Schema(
             country: {
                 type: String,
                 required: true,
-                default: "United States",
+                default: "Bangladesh",
             },
         },
         paymentMethod: {
@@ -85,7 +85,36 @@ const orderSchema = new mongoose.Schema(
         paymentDetails: {
             transactionId: String,
             paymentTime: Date,
+            securityFingerprint: String,
+            method: String,
+            card: {
+                last4: String,
+                brand: String,
+                expiryMonth: String,
+                expiryYear: String,
+                holderName: String,
+            },
+            bankTransfer: {
+                bankName: String,
+                accountName: String,
+                referenceNumber: String,
+            },
         },
+        clientInfo: {
+            userAgent: String,
+            ipAddress: String,
+            sessionId: String,
+        },
+        timeline: [
+            {
+                status: String,
+                timestamp: {
+                    type: Date,
+                    default: Date.now,
+                },
+                note: String,
+            },
+        ],
     },
     { timestamps: true }
 );

@@ -1,10 +1,11 @@
 // filepath: c:\Users\HP\Desktop\PC-Builders\frontend\src\components\Admin\Orders\OrderDetailsModal.jsx
-import React from "react";
-import { FileText, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { FileText, X, Shield, Clock } from "lucide-react";
 import { formatDate } from "../../../utils/dateUtils";
 import OrderStatusButtons from "./OrderStatusButtons";
 import PaymentStatusButtons from "./PaymentStatusButtons";
 import OrderItemsList from "./OrderItemsList";
+import usePaymentService from "../../../stores/usePaymentService";
 
 // Print icon component
 const PrintIcon = ({ size = 24, className = "" }) => (
@@ -38,6 +39,27 @@ const OrderDetailsModal = ({
   handleUpdateOrderStatus,
   handleUpdatePaymentStatus,
 }) => {
+  const { getOrderPaymentDetails, loading: paymentDetailsLoading } =
+    usePaymentService();
+  const [paymentDetails, setPaymentDetails] = useState(null);
+  const [showFullPaymentDetails, setShowFullPaymentDetails] = useState(false);
+
+  // Fetch enhanced payment details when order is selected
+  useEffect(() => {
+    if (order?._id) {
+      const fetchPaymentDetails = async () => {
+        try {
+          const details = await getOrderPaymentDetails(order._id);
+          setPaymentDetails(details);
+        } catch (error) {
+          console.error("Failed to fetch payment details:", error);
+        }
+      };
+
+      fetchPaymentDetails();
+    }
+  }, [order?._id, getOrderPaymentDetails]);
+
   if (!order) return null;
 
   return (
@@ -207,6 +229,182 @@ const OrderDetailsModal = ({
             </div>
           </div>
 
+          {/* Enhanced Payment Details */}
+          <div className="mb-6">
+            <h4 className="mb-2 flex items-center gap-1 font-semibold">
+              <Shield size={18} />
+              Payment Details
+            </h4>
+            <div className="bg-base-200 rounded-lg p-4 shadow-sm">
+              {paymentDetailsLoading ? (
+                <div className="flex justify-center py-4">
+                  <span className="loading loading-spinner loading-md"></span>
+                </div>
+              ) : !paymentDetails ? (
+                <p className="text-center text-sm text-gray-500">
+                  Payment details unavailable
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    <span className="text-gray-600">Payment Method:</span>
+                    <span className="font-medium">
+                      {order.paymentMethod === "card"
+                        ? "Credit/Debit Card"
+                        : "Bank Transfer"}
+                    </span>
+
+                    <span className="text-gray-600">Transaction ID:</span>
+                    <span className="font-mono text-sm">
+                      {paymentDetails.paymentDetails?.transactionId || "N/A"}
+                    </span>
+
+                    <span className="text-gray-600">Payment Time:</span>
+                    <span>
+                      {paymentDetails.paymentDetails?.paymentTime
+                        ? formatDate(paymentDetails.paymentDetails.paymentTime)
+                        : "N/A"}
+                    </span>
+                  </div>
+
+                  {/* Method-specific details */}
+                  {order.paymentMethod === "card" &&
+                    paymentDetails.paymentDetails?.card && (
+                      <div className="border-t pt-3">
+                        <h5 className="mb-2 font-medium">Card Details</h5>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <span className="text-gray-600">Card Brand:</span>
+                          <span>
+                            {paymentDetails.paymentDetails.card.brand ||
+                              "Unknown"}
+                          </span>
+
+                          <span className="text-gray-600">Last 4 digits:</span>
+                          <span className="font-mono">
+                            {paymentDetails.paymentDetails.card.last4 || "xxxx"}
+                          </span>
+
+                          <span className="text-gray-600">Cardholder:</span>
+                          <span>
+                            {paymentDetails.paymentDetails.card.holderName ||
+                              "N/A"}
+                          </span>
+
+                          <span className="text-gray-600">Expiry:</span>
+                          <span>
+                            {paymentDetails.paymentDetails.card.expiryMonth &&
+                            paymentDetails.paymentDetails.card.expiryYear
+                              ? `${paymentDetails.paymentDetails.card.expiryMonth}/${paymentDetails.paymentDetails.card.expiryYear.substr(2)}`
+                              : "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                  {order.paymentMethod === "bank_transfer" &&
+                    paymentDetails.paymentDetails?.bankTransfer && (
+                      <div className="border-t pt-3">
+                        <h5 className="mb-2 font-medium">Bank Details</h5>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <span className="text-gray-600">Bank Name:</span>
+                          <span>
+                            {paymentDetails.paymentDetails.bankTransfer
+                              .bankName || "N/A"}
+                          </span>
+
+                          <span className="text-gray-600">Account Name:</span>
+                          <span>
+                            {paymentDetails.paymentDetails.bankTransfer
+                              .accountName || "N/A"}
+                          </span>
+
+                          <span className="text-gray-600">
+                            Reference Number:
+                          </span>
+                          <span className="font-mono">
+                            {paymentDetails.paymentDetails.bankTransfer
+                              .referenceNumber || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Security Information - Collapsed by default */}
+                  <button
+                    className="btn btn-sm btn-outline w-full"
+                    onClick={() =>
+                      setShowFullPaymentDetails(!showFullPaymentDetails)
+                    }
+                  >
+                    {showFullPaymentDetails ? "Hide" : "Show"} Security
+                    Information
+                  </button>
+
+                  {showFullPaymentDetails && paymentDetails.clientInfo && (
+                    <div className="border-t pt-3 text-sm">
+                      <h5 className="mb-2 font-medium">Security Information</h5>
+                      <div className="grid grid-cols-2 gap-2">
+                        <span className="text-gray-600">IP Address:</span>
+                        <span className="font-mono">
+                          {paymentDetails.clientInfo.ipAddress || "Unknown"}
+                        </span>
+
+                        <span className="text-gray-600">User Agent:</span>
+                        <span className="truncate">
+                          {paymentDetails.clientInfo.userAgent || "Unknown"}
+                        </span>
+
+                        <span className="text-gray-600">Session ID:</span>
+                        <span className="font-mono text-xs">
+                          {paymentDetails.clientInfo.sessionId || "Unknown"}
+                        </span>
+
+                        <span className="text-gray-600">
+                          Security Fingerprint:
+                        </span>
+                        <span className="font-mono text-xs">
+                          {paymentDetails.paymentDetails?.securityFingerprint ||
+                            "Not available"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Payment Timeline */}
+                  {paymentDetails.timeline &&
+                    paymentDetails.timeline.length > 0 && (
+                      <div className="border-t pt-3">
+                        <h5 className="mb-2 flex items-center gap-1 font-medium">
+                          <Clock size={14} />
+                          Payment Timeline
+                        </h5>
+                        <ol className="relative border-l border-gray-300 text-sm">
+                          {paymentDetails.timeline.map((event, index) => (
+                            <li key={index} className="mb-4 ml-6">
+                              <span className="bg-primary ring-base-200 absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full ring-8">
+                                <span className="h-2 w-2 rounded-full bg-white"></span>
+                              </span>
+                              <h6 className="font-medium capitalize">
+                                {event.status.replace("_", " ")}
+                              </h6>
+                              <p className="text-gray-500">
+                                {formatDate(event.timestamp)}
+                              </p>
+                              {event.note && (
+                                <p className="mt-1 text-gray-600">
+                                  {event.note}
+                                </p>
+                              )}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Order Items */}
           <div className="mb-6">
             <h4 className="mb-2 flex items-center gap-1 font-semibold">
@@ -251,7 +449,7 @@ const OrderDetailsModal = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path>
+                <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path>
                 <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
                 <path d="M12 17.5v-11"></path>
               </svg>
@@ -284,7 +482,7 @@ const OrderDetailsModal = ({
             className="btn btn-primary"
             onClick={() => {
               // Implement any action you want here (e.g., print order, export, etc.)
-              console.log("Action on order", order._id);
+              window.print();
             }}
           >
             <PrintIcon size={18} />

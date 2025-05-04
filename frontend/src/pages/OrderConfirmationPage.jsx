@@ -133,14 +133,14 @@ const OrderConfirmationPage = () => {
               </div>
 
               <div
-                className={`flex flex-col items-center text-center ${currentOrder.orderStatus === "delivered" ? "text-primary" : ""}`}
+                className={`flex flex-col items-center text-center ${currentOrder.orderStatus === "shipped" ? "text-primary" : ""}`}
               >
                 <div
-                  className={`mb-2 h-8 w-8 rounded-full ${currentOrder.orderStatus === "delivered" ? "bg-primary text-primary-content" : "bg-base-300 text-base-content"} flex items-center justify-center text-sm`}
+                  className={`mb-2 h-8 w-8 rounded-full ${currentOrder.orderStatus === "shipped" ? "bg-primary text-primary-content" : "bg-base-300 text-base-content"} flex items-center justify-center text-sm`}
                 >
                   3
                 </div>
-                <span className="text-xs">Out for Delivery</span>
+                <span className="text-xs">On the way</span>
               </div>
 
               <div

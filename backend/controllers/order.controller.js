@@ -10,6 +10,7 @@ export const createOrder = async (req, res) => {
         const {
             shippingAddress,
             paymentMethod,
+            paymentDetails,
             subtotal,
             tax,
             shipping,
@@ -64,7 +65,54 @@ export const createOrder = async (req, res) => {
             });
         }
 
-        // Create the order
+        // Process payment details securely
+        const enhancedPaymentDetails = {
+            transactionId: `TXN-${Date.now()}-${Math.floor(
+                Math.random() * 10000
+            )}`,
+            paymentTime: new Date(),
+            method: paymentMethod,
+            securityFingerprint: paymentDetails?.securityFingerprint || null,
+        };
+
+        // Process method-specific payment details
+        if (paymentMethod === "card" && paymentDetails?.card) {
+            enhancedPaymentDetails.card = {
+                last4: paymentDetails.card.last4 || "",
+                brand: paymentDetails.card.brand || "",
+                expiryMonth: paymentDetails.card.expiryMonth || "",
+                expiryYear: paymentDetails.card.expiryYear || "",
+                holderName: paymentDetails.card.holderName || "",
+            };
+        } else if (
+            paymentMethod === "bank_transfer" &&
+            paymentDetails?.bankTransfer
+        ) {
+            enhancedPaymentDetails.bankTransfer = {
+                bankName: paymentDetails.bankTransfer.bankName || "",
+                accountName: paymentDetails.bankTransfer.accountName || "",
+                referenceNumber:
+                    paymentDetails.bankTransfer.referenceNumber || "",
+            };
+        }
+
+        // Collect client information for security and analytics
+        const clientInfo = {
+            userAgent: req.headers["user-agent"] || "Unknown",
+            ipAddress: req.ip || req.connection.remoteAddress || "Unknown",
+            sessionId: req.sessionID || `session-${Date.now()}`,
+        };
+
+        // Create initial timeline entry
+        const initialTimeline = [
+            {
+                status: "created",
+                timestamp: new Date(),
+                note: "Order placed successfully",
+            },
+        ];
+
+        // Create the order with enhanced data
         const order = await Order.create({
             user: userId,
             items: orderItems,
@@ -76,12 +124,9 @@ export const createOrder = async (req, res) => {
             total,
             paymentStatus:
                 paymentMethod === "bank_transfer" ? "pending" : "completed",
-            paymentDetails: {
-                transactionId: `TXN-${Date.now()}-${Math.floor(
-                    Math.random() * 1000
-                )}`,
-                paymentTime: new Date(),
-            },
+            paymentDetails: enhancedPaymentDetails,
+            clientInfo,
+            timeline: initialTimeline,
         });
 
         // Clear the user's cart
@@ -197,12 +242,41 @@ export const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: "Order not found" });
         }
 
-        if (orderStatus) order.orderStatus = orderStatus;
-        if (paymentStatus) order.paymentStatus = paymentStatus;
+        // Add a new timeline entry for this status change
+        const timelineEntry = {
+            timestamp: new Date(),
+            note: `Status updated by admin`,
+        };
+
+        if (orderStatus) {
+            order.orderStatus = orderStatus;
+            timelineEntry.status = `order_${orderStatus}`;
+            timelineEntry.note = `Order status updated to ${orderStatus}`;
+        }
+
+        if (paymentStatus) {
+            order.paymentStatus = paymentStatus;
+            timelineEntry.status = `payment_${paymentStatus}`;
+            timelineEntry.note = `Payment status updated to ${paymentStatus}`;
+        }
+
+        // Add the new timeline entry
+        order.timeline.push(timelineEntry);
 
         await order.save();
 
-        res.status(200).json(order);
+        // Get fully populated order to return
+        const updatedOrder = await Order.findById(orderId)
+            .populate({
+                path: "items.product",
+                select: "modelNo description image",
+            })
+            .populate({
+                path: "user",
+                select: "fname lname email phone",
+            });
+
+        res.status(200).json(updatedOrder);
     } catch (error) {
         console.error("Error updating order status:", error.message);
         res.status(500).json({ message: "Internal server error" });
@@ -237,6 +311,13 @@ export const cancelOrder = async (req, res) => {
             order.paymentStatus = "refunded";
         }
 
+        // Add a timeline entry for cancellation
+        order.timeline.push({
+            status: "cancelled",
+            timestamp: new Date(),
+            note: "Order cancelled by customer",
+        });
+
         await order.save();
 
         // Restore the product stock
@@ -257,3 +338,121 @@ export const cancelOrder = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+// Validate payment information (for security checks)
+export const validatePayment = async (req, res) => {
+    try {
+        const { paymentMethod, paymentData } = req.body;
+
+        // This would connect to a payment processor in a real app
+        // Here we'll simulate validation with basic checks
+
+        if (paymentMethod === "card") {
+            // Validate card information
+            if (
+                !paymentData.cardNumber ||
+                !paymentData.expiryDate ||
+                !paymentData.cvv
+            ) {
+                return res.status(400).json({
+                    valid: false,
+                    message: "Missing required card information",
+                });
+            }
+
+            // Simulate card validation (in real app, this would use a payment processor's API)
+            const isValid = validateCardFormat(paymentData);
+
+            if (!isValid) {
+                return res.status(400).json({
+                    valid: false,
+                    message: "Invalid card information",
+                });
+            }
+        } else if (paymentMethod === "bank_transfer") {
+            // Validate bank transfer information
+            if (!paymentData.bankName || !paymentData.accountName) {
+                return res.status(400).json({
+                    valid: false,
+                    message: "Missing required bank information",
+                });
+            }
+        } else {
+            return res.status(400).json({
+                valid: false,
+                message: "Invalid payment method",
+            });
+        }
+
+        // Return successful validation
+        res.status(200).json({
+            valid: true,
+            message: "Payment information validated successfully",
+            transactionId: `TXN-${Date.now()}-${Math.floor(
+                Math.random() * 10000
+            )}`,
+        });
+    } catch (error) {
+        console.error("Payment validation error:", error.message);
+        res.status(500).json({
+            valid: false,
+            message: "Payment validation error",
+        });
+    }
+};
+
+// Admin: Get order payment details
+export const getOrderPaymentDetails = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findById(orderId)
+            .select("paymentMethod paymentStatus paymentDetails timeline")
+            .populate({
+                path: "user",
+                select: "fname lname email phone",
+            });
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        res.status(200).json({
+            orderId: order._id,
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus,
+            paymentDetails: order.paymentDetails,
+            timeline: order.timeline.filter(
+                (item) =>
+                    item.status.startsWith("payment_") ||
+                    item.status === "created" ||
+                    item.status === "cancelled"
+            ),
+            user: order.user,
+        });
+    } catch (error) {
+        console.error("Error fetching payment details:", error.message);
+        res.status(500).json({ message: "Failed to retrieve payment details" });
+    }
+};
+
+// Helper function for card validation
+function validateCardFormat(cardData) {
+    // Check card number format (16 digits)
+    if (!/^\d{16}$/.test(cardData.cardNumber.replace(/\s/g, ""))) {
+        return false;
+    }
+
+    // Check expiry date format (MM/YY)
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardData.expiryDate)) {
+        return false;
+    }
+
+    // Check CVV format (3-4 digits)
+    if (!/^\d{3,4}$/.test(cardData.cvv)) {
+        return false;
+    }
+
+    // Card is valid format
+    return true;
+}

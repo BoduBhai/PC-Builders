@@ -204,11 +204,10 @@ const ProductDetailsPage = () => {
 
         <Link
           to="/products"
-          className="hover:text-primary group inline-flex items-center gap-2 text-sm font-medium transition-colors"
+          className="hover:text-primary flex items-center text-sm font-medium transition-colors"
+          aria-label="Return to products page"
         >
-          <span className="bg-base-200 group-hover:bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full transition-colors">
-            <ArrowLeft size={16} />
-          </span>
+          <ArrowLeft size={18} className="mr-2" />
           Back to Products
         </Link>
       </nav>
