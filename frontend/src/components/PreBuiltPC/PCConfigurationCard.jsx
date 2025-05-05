@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ShoppingCart, ChevronDown, ChevronUp, Layers } from "lucide-react";
 import ResponsiveImage from "../../components/ui/ResponsiveImage";
 import { getComponentImage, getComponentName } from "../BuildPC/componentUtils";
+import { formatPrice } from "../../utils/constants";
 import ComponentList from "./ComponentList";
 
 const PCConfigurationCard = ({
@@ -58,27 +59,25 @@ const PCConfigurationCard = ({
               </h2>
               <p className="text-base-content/80 mt-1 max-w-md">
                 {isCustom
-                  ? `Optimized for your ৳${targetBudget.toLocaleString()} budget`
+                  ? `Optimized for your ${formatPrice(targetBudget)} budget`
                   : description}
               </p>
             </div>
 
             <div className="mt-4 text-right md:mt-0">
               <div className="text-primary text-3xl font-bold">
-                ৳{totalPrice.toLocaleString()}
+                {formatPrice(totalPrice)}
               </div>
 
               {isCustom && (
                 <div className="mt-1 text-xs">
                   {totalPrice < targetBudget ? (
                     <span className="text-success">
-                      ৳{(targetBudget - totalPrice).toLocaleString()} under
-                      budget
+                      {formatPrice(targetBudget - totalPrice)} under budget
                     </span>
                   ) : (
                     <span className="text-error">
-                      ৳{(totalPrice - targetBudget).toLocaleString()} over
-                      budget
+                      {formatPrice(totalPrice - targetBudget)} over budget
                     </span>
                   )}
                 </div>

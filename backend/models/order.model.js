@@ -51,7 +51,7 @@ const orderSchema = new mongoose.Schema(
         paymentMethod: {
             type: String,
             required: true,
-            enum: ["card", "bank_transfer"],
+            enum: ["card", "bank_transfer", "pay_on_pickup"],
         },
         paymentStatus: {
             type: String,
@@ -99,11 +99,6 @@ const orderSchema = new mongoose.Schema(
                 accountName: String,
                 referenceNumber: String,
             },
-        },
-        clientInfo: {
-            userAgent: String,
-            ipAddress: String,
-            sessionId: String,
         },
         timeline: [
             {

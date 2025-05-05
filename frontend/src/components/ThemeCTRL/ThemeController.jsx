@@ -10,8 +10,17 @@ const ThemeController = () => {
   };
 
   useEffect(() => {
+    // Set theme attribute on document element whenever theme changes
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+  // Apply theme from localStorage immediately to prevent flashing
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    }
+  }, []);
 
   return (
     <label className="swap swap-rotate">

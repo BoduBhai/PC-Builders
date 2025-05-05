@@ -1,4 +1,5 @@
 import { X, Search } from "lucide-react";
+import { formatPrice } from "../../utils/constants";
 
 const ComponentModal = ({
   activeModal,
@@ -89,14 +90,15 @@ const ComponentModal = ({
                       </td>
                       <td>
                         <div className="font-semibold">
-                          ৳
-                          {product.onDiscount
-                            ? product.discountPrice
-                            : product.price}
+                          {formatPrice(
+                            product.onDiscount
+                              ? product.discountPrice
+                              : product.price,
+                          )}
                         </div>
                         {product.onDiscount && (
                           <span className="text-sm line-through opacity-60">
-                            ৳{product.price}
+                            {formatPrice(product.price)}
                           </span>
                         )}
                       </td>

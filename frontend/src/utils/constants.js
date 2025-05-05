@@ -111,8 +111,8 @@ export const featuredCategories = [
   },
   {
     name: "CPU Cooler",
-    image: "/monitor.avif",
-    description: "High-resolution displays for immersive viewing",
+    image: "/cooling-fan.avif",
+    description: "Efficient cooling solutions for your processor",
   },
   {
     name: "Keyboard",
@@ -145,3 +145,22 @@ export const featuredCategories = [
     description: "Essential peripherals to complete your setup",
   },
 ];
+
+/**
+ * Format price with locale-specific formatting and currency symbol
+ * @param {number} price - The price to format
+ * @param {boolean} showDecimals - Whether to show decimal places (default: false)
+ * @returns {string} Formatted price with currency symbol
+ */
+export const formatPrice = (price, showDecimals = false) => {
+  if (price === undefined || price === null) return "৳0";
+
+  const formattedPrice = showDecimals
+    ? price.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : Math.round(price).toLocaleString();
+
+  return `৳${formattedPrice}`;
+};

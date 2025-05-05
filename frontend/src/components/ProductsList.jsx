@@ -63,15 +63,17 @@ const ProductsList = () => {
     }
   };
 
-  // Handle delete product modal
+  // Handle product delete confirmation
   const handleDeleteClick = (product) => {
     setProductToDelete(product);
     document.getElementById("delete_product_modal").showModal();
   };
 
   const confirmProductDelete = async () => {
+    if (!productToDelete) return;
+
     try {
-      await deleteProduct(productToDelete?._id);
+      await deleteProduct(productToDelete._id);
       document.getElementById("delete_product_modal").close();
       setProductToDelete(null);
     } catch (error) {
@@ -83,12 +85,10 @@ const ProductsList = () => {
   };
 
   return (
-    <div className="container mx-auto mb-20 max-w-6xl rounded-lg p-5">
-      {/* Products Table */}
-      <h2 className="mb-10 text-center text-3xl font-bold">Products List</h2>
-
+    <div className="container mx-auto">
       <ProductTable
         products={products}
+        loading={loading}
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteClick}
         onDiscountToggleClick={handleDiscountToggleClick}

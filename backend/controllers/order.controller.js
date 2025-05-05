@@ -96,13 +96,6 @@ export const createOrder = async (req, res) => {
             };
         }
 
-        // Collect client information for security and analytics
-        const clientInfo = {
-            userAgent: req.headers["user-agent"] || "Unknown",
-            ipAddress: req.ip || req.connection.remoteAddress || "Unknown",
-            sessionId: req.sessionID || `session-${Date.now()}`,
-        };
-
         // Create initial timeline entry
         const initialTimeline = [
             {
@@ -123,9 +116,9 @@ export const createOrder = async (req, res) => {
             shipping,
             total,
             paymentStatus:
-                paymentMethod === "bank_transfer" ? "pending" : "completed",
+                req.body.paymentStatus ||
+                (paymentMethod === "pay_on_pickup" ? "pending" : "completed"),
             paymentDetails: enhancedPaymentDetails,
-            clientInfo,
             timeline: initialTimeline,
         });
 
@@ -249,9 +242,45 @@ export const updateOrderStatus = async (req, res) => {
         };
 
         if (orderStatus) {
+            // Special handling for order cancellation by admin
+            if (orderStatus === "cancelled") {
+                // If payment was completed, automatically mark as refunded
+                if (order.paymentStatus === "completed" && !paymentStatus) {
+                    order.paymentStatus = "refunded";
+                    timelineEntry.status = "order_cancelled_payment_refunded";
+                    timelineEntry.note =
+                        "Order cancelled by admin and payment automatically refunded";
+
+                    // Add a separate refund entry for clear tracking
+                    order.timeline.push({
+                        status: "payment_refunded",
+                        timestamp: new Date(),
+                        note: `Payment refunded due to order cancellation by admin`,
+                    });
+
+                    // Restore the product stock
+                    for (const item of order.items) {
+                        await Product.findByIdAndUpdate(item.product, {
+                            $inc: { stock: item.quantity },
+                        });
+                    }
+                } else {
+                    timelineEntry.status = "order_cancelled";
+                    timelineEntry.note = "Order cancelled by admin";
+
+                    // Restore the product stock
+                    for (const item of order.items) {
+                        await Product.findByIdAndUpdate(item.product, {
+                            $inc: { stock: item.quantity },
+                        });
+                    }
+                }
+            } else {
+                timelineEntry.status = `order_${orderStatus}`;
+                timelineEntry.note = `Order status updated to ${orderStatus}`;
+            }
+
             order.orderStatus = orderStatus;
-            timelineEntry.status = `order_${orderStatus}`;
-            timelineEntry.note = `Order status updated to ${orderStatus}`;
         }
 
         if (paymentStatus) {
@@ -260,7 +289,7 @@ export const updateOrderStatus = async (req, res) => {
             timelineEntry.note = `Payment status updated to ${paymentStatus}`;
         }
 
-        // Add the new timeline entry
+        // Add the timeline entry
         order.timeline.push(timelineEntry);
 
         await order.save();
@@ -422,12 +451,7 @@ export const getOrderPaymentDetails = async (req, res) => {
             paymentMethod: order.paymentMethod,
             paymentStatus: order.paymentStatus,
             paymentDetails: order.paymentDetails,
-            timeline: order.timeline.filter(
-                (item) =>
-                    item.status.startsWith("payment_") ||
-                    item.status === "created" ||
-                    item.status === "cancelled"
-            ),
+            timeline: order.timeline, // Return the complete timeline without filtering
             user: order.user,
         });
     } catch (error) {

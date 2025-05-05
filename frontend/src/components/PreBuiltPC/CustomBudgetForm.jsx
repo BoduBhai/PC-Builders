@@ -14,7 +14,9 @@ const CustomBudgetForm = ({
     regular: "Home/Office PC",
   };
 
-  // TODO : A lot of fixes needed
+  // Min and max budget values
+  const MIN_BUDGET = 25000;
+  const MAX_BUDGET = 120000;
 
   return (
     <div className="card from-base-100 to-base-200 border-base-300 border bg-gradient-to-br shadow-lg">
@@ -39,7 +41,9 @@ const CustomBudgetForm = ({
               <Cpu size={16} className="mr-2" />
               Enter Your Budget Amount
             </span>
-            <span className="label-text-alt">Range starts from ৳25000 </span>
+            <span className="label-text-alt">
+              Range starts from ৳{MIN_BUDGET.toLocaleString()}
+            </span>
           </label>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -50,12 +54,12 @@ const CustomBudgetForm = ({
                 </span>
                 <input
                   type="number"
-                  min="25000"
+                  min={MIN_BUDGET}
                   step="50"
                   value={customBudget}
                   onChange={(e) =>
                     setCustomBudget(
-                      Math.max(25000, parseInt(e.target.value) || 0),
+                      Math.max(MIN_BUDGET, parseInt(e.target.value) || 0),
                     )
                   }
                   className="join-item input input-bordered w-full"
@@ -104,13 +108,13 @@ const CustomBudgetForm = ({
               <div
                 className="bg-primary h-2.5 rounded-full"
                 style={{
-                  width: `${Math.min(100, (customBudget / 120000) * 100)}%`,
+                  width: `${Math.min(100, (customBudget / MAX_BUDGET) * 100)}%`,
                 }}
               ></div>
             </div>
             <div className="mt-1 flex justify-between text-xs">
-              <span>৳400</span>
-              <span>৳120,000</span>
+              <span>৳{MIN_BUDGET.toLocaleString()}</span>
+              <span>৳{MAX_BUDGET.toLocaleString()}</span>
             </div>
           </div>
         </div>

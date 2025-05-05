@@ -51,8 +51,8 @@ const OrderConfirmationPage = () => {
   const orderDate = formatDate(currentOrder.createdAt);
 
   return (
-    <div className="container mx-auto my-10 p-4 pt-16">
-      <div className="mb-8 text-center">
+    <div className="bg-base-200 rounded-lg p-6">
+      <header className="mb-8 text-center">
         <div className="mb-4 flex justify-center">
           <CheckCircle className="text-success" size={60} />
         </div>
@@ -60,7 +60,7 @@ const OrderConfirmationPage = () => {
         <p className="text-base-content/70">
           Thank you for your purchase. Your order has been received.
         </p>
-      </div>
+      </header>
 
       <div className="bg-base-100 mx-auto max-w-4xl rounded-lg p-6 shadow-lg">
         <div className="mb-6 grid gap-4 md:grid-cols-2">
@@ -101,7 +101,9 @@ const OrderConfirmationPage = () => {
               <CreditCard size={18} className="mr-2" />
               {currentOrder.paymentMethod === "card"
                 ? "Credit/Debit Card"
-                : "Bank Transfer"}
+                : currentOrder.paymentMethod === "bank_transfer"
+                  ? "Bank Transfer"
+                  : "Pay during pickup"}
             </p>
           </div>
         </div>
@@ -250,6 +252,46 @@ const OrderConfirmationPage = () => {
                   #{currentOrder._id.substring(currentOrder._id.length - 8)}
                 </span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {currentOrder.paymentMethod === "pay_on_pickup" && (
+          <div className="bg-base-200 mb-6 rounded-lg p-4">
+            <h3 className="mb-2 font-semibold">Pickup Payment Information</h3>
+            <p className="mb-3 text-sm">
+              You've selected to pay during pickup. Please note the following
+              information:
+            </p>
+            <div className="mb-3 text-sm">
+              <div className="mb-1 grid grid-cols-2">
+                <span className="font-medium">Payment Status:</span>
+                <span className="badge badge-warning">Pending</span>
+              </div>
+              <div className="mb-1 grid grid-cols-2">
+                <span className="font-medium">Store Address:</span>
+                <span>PC Builders Store, 123 Tech Street, Dhaka</span>
+              </div>
+              <div className="mb-1 grid grid-cols-2">
+                <span className="font-medium">Store Hours:</span>
+                <span>Mon-Sat: 10:00 AM - 8:00 PM</span>
+              </div>
+              <div className="mb-1 grid grid-cols-2">
+                <span className="font-medium">Order Reference:</span>
+                <span className="font-mono">
+                  #{currentOrder._id.substring(currentOrder._id.length - 8)}
+                </span>
+              </div>
+              <div className="mb-1 grid grid-cols-2">
+                <span className="font-medium">Payment Methods Accepted:</span>
+                <span>Cash, Credit/Debit Card, Mobile Payment</span>
+              </div>
+            </div>
+            <div className="alert alert-info mt-2 text-sm">
+              <p>
+                Please bring a valid ID and your order reference number when
+                picking up your order. Your items will be held for 7 days.
+              </p>
             </div>
           </div>
         )}

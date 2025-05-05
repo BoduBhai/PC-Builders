@@ -173,13 +173,59 @@ export const updateProfile = async (req, res) => {
             updateData.profilePicture = cloudinaryResponse.secure_url;
         }
 
-        // Handle structured address update
+        // Handle address updates properly to avoid conflicts
         if (updateData.address) {
+            // If address is a string, it's probably intended as the street address
             if (typeof updateData.address === "string") {
+                // Create complete address object with only street updated
                 updateData.address = {
-                    ...currentUser.address,
                     street: updateData.address,
+                    city: currentUser.address?.city || "",
+                    state: currentUser.address?.state || "",
+                    zipCode: currentUser.address?.zipCode || "",
+                    country: currentUser.address?.country || "",
                 };
+            } else if (typeof updateData.address === "object") {
+                // If it's an object with partial fields, merge with current address
+                updateData.address = {
+                    street:
+                        updateData.address.street ||
+                        currentUser.address?.street ||
+                        "",
+                    city:
+                        updateData.address.city ||
+                        currentUser.address?.city ||
+                        "",
+                    state:
+                        updateData.address.state ||
+                        currentUser.address?.state ||
+                        "",
+                    zipCode:
+                        updateData.address.zipCode ||
+                        currentUser.address?.zipCode ||
+                        "",
+                    country:
+                        updateData.address.country ||
+                        currentUser.address?.country ||
+                        "",
+                };
+            }
+        }
+
+        // Handle individual address field updates
+        const addressFields = [
+            "address.street",
+            "address.city",
+            "address.state",
+            "address.zipCode",
+            "address.country",
+        ];
+        for (const field of addressFields) {
+            if (field in updateData) {
+                // If individual address fields are being updated, make sure we're not also updating the whole address
+                if (updateData.address) {
+                    delete updateData[field]; // Remove individual field as we're updating the whole object
+                }
             }
         }
 
@@ -191,12 +237,10 @@ export const updateProfile = async (req, res) => {
             });
 
             if (phoneExists) {
-                return res
-                    .status(400)
-                    .json({
-                        message:
-                            "Phone number already registered with another account",
-                    });
+                return res.status(400).json({
+                    message:
+                        "Phone number already registered with another account",
+                });
             }
         }
 

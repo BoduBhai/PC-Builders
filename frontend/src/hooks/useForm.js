@@ -7,10 +7,24 @@ const useForm = (initialValues, onSubmit, validate) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setValues({
-      ...values,
-      [name]: value,
-    });
+
+    // Handle nested objects (e.g., address.street)
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setValues({
+        ...values,
+        [parent]: {
+          ...values[parent],
+          [child]: value,
+        },
+      });
+    } else {
+      // Handle regular fields
+      setValues({
+        ...values,
+        [name]: value,
+      });
+    }
 
     // Clear error when field is edited
     if (errors[name]) {
@@ -51,10 +65,22 @@ const useForm = (initialValues, onSubmit, validate) => {
   };
 
   const setFieldValue = (field, value) => {
-    setValues({
-      ...values,
-      [field]: value,
-    });
+    // Handle nested objects for setFieldValue as well
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setValues({
+        ...values,
+        [parent]: {
+          ...values[parent],
+          [child]: value,
+        },
+      });
+    } else {
+      setValues({
+        ...values,
+        [field]: value,
+      });
+    }
   };
 
   return {

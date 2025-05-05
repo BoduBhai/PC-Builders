@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useProductStore } from "../stores/useProductStore";
 import { useCartStore } from "../stores/useCartStore";
-import { ShoppingCart, ChevronRight, ArrowLeft } from "lucide-react";
+import {
+  ShoppingCart,
+  ChevronRight,
+  ArrowLeft,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 
 // Import custom components
@@ -15,6 +20,7 @@ import {
   getCategoryForComponentType,
   componentCategories,
 } from "../components/BuildPC/componentUtils";
+import { formatPrice } from "../utils/constants";
 
 const BuildPCPage = () => {
   const { products, loading, fetchProducts } = useProductStore();
@@ -125,6 +131,10 @@ const BuildPCPage = () => {
     });
     setTotalAmount(total);
   }, [selectedComponents]);
+
+  // Count selected components
+  const selectedComponentsCount =
+    Object.values(selectedComponents).filter(Boolean).length;
 
   // Add entire build to cart
   const handleAddBuildToCart = async () => {
@@ -251,9 +261,14 @@ const BuildPCPage = () => {
           <aside className="lg:w-1/4">
             <div className="card bg-base-200 sticky top-20 shadow-lg">
               <div className="card-body">
-                <h2 className="card-title">Total Amount</h2>
+                <h2 className="card-title flex justify-between">
+                  <span>Build Summary</span>
+                  <span className="badge badge-primary">
+                    {selectedComponentsCount} items
+                  </span>
+                </h2>
                 <div className="my-4 text-center text-3xl font-bold">
-                  ৳{totalAmount.toFixed(2)}
+                  {formatPrice(totalAmount)}
                 </div>
                 <nav className="mt-4">
                   <button
@@ -302,19 +317,7 @@ const BuildPCPage = () => {
                     role="alert"
                     className="alert mt-4 bg-red-600/70 text-white"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 shrink-0 stroke-current"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <AlertCircle className="h-6 w-6 shrink-0" />
                     <span>
                       Processor and Motherboard are required to complete your
                       build.

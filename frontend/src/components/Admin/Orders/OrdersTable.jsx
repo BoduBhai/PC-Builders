@@ -4,6 +4,7 @@ import {
   Package,
   CreditCard,
   BanknoteIcon,
+  Store,
   Search,
   Filter,
   RefreshCw,
@@ -11,9 +12,6 @@ import {
 import { formatDate } from "../../../utils/dateUtils";
 import LoadingSpinner from "../../LoadingSpinner";
 
-/**
- * Component to display orders table with integrated filtering, search, and sorting
- */
 const OrdersTable = ({ orders, loading, onViewOrder, onRefresh }) => {
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,6 +117,8 @@ const OrdersTable = ({ orders, loading, onViewOrder, onRefresh }) => {
         return <CreditCard size={size} />;
       case "bank_transfer":
         return <BanknoteIcon size={size} />;
+      case "pay_on_pickup":
+        return <Store size={size} />;
       default:
         return null;
     }
@@ -264,7 +264,6 @@ const OrdersTable = ({ orders, loading, onViewOrder, onRefresh }) => {
                       </td>
                       <td>
                         <div className="flex items-center gap-1">
-                          <Calendar size={16} className="opacity-70" />
                           <span>{formatDate(order.createdAt)}</span>
                         </div>
                       </td>

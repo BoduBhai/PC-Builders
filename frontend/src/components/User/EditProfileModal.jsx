@@ -44,19 +44,6 @@ const EditProfileModal = ({ user, loading, onSave }) => {
     }
   }, [user, setEditFormData]);
 
-  // Special handler for address fields
-  const handleAddressChange = (e) => {
-    const { name, value } = e.target;
-    const addressField = name.split(".")[1];
-    setEditFormData({
-      ...editFormData,
-      address: {
-        ...editFormData.address,
-        [addressField]: value,
-      },
-    });
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -78,8 +65,6 @@ const EditProfileModal = ({ user, loading, onSave }) => {
 
   const avatarUrl = user?.profilePicture || "/avatar.avif";
 
-  if (!user) return null;
-
   return (
     <dialog
       id="edit_profile_modal"
@@ -87,156 +72,121 @@ const EditProfileModal = ({ user, loading, onSave }) => {
     >
       <div className="modal-box">
         <h3 className="text-lg font-bold">Edit Profile</h3>
-        <div className="flex flex-col gap-4 py-4">
-          {/* Profile Picture Upload */}
-          <div className="flex flex-col items-center gap-2">
-            <div className="avatar">
-              <div className="w-32 rounded-full">
-                <img
-                  src={editFormData.profilePicture || avatarUrl}
-                  alt={user?.fname || "User"}
-                />
-              </div>
-            </div>
-            <div className="mt-4 flex w-full">
-              <div className="flex w-1/4 flex-col items-center justify-center">
-                Change image
-              </div>
-              <div className="w-3/4">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="file-input file-input-bordered w-full max-w-xs"
-                  onChange={handleImageChange}
-                />
-              </div>
+        <div className="flex flex-col items-center gap-2">
+          <div className="avatar">
+            <div className="w-32 rounded-full">
+              <img
+                src={editFormData.profilePicture || avatarUrl}
+                alt={user?.fname || "User"}
+              />
             </div>
           </div>
+          <div className="mt-4 flex w-full">
+            <div className="flex w-1/4 flex-col items-center justify-center">
+              Change image
+            </div>
+            <div className="w-3/4">
+              <input
+                type="file"
+                accept="image/*"
+                className="file-input file-input-bordered w-full max-w-xs"
+                onChange={handleImageChange}
+              />
+            </div>
+          </div>
+        </div>
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Profile Picture Upload */}
 
-          {/* Name */}
-          <div className="flex flex-col gap-2 sm:flex-row">
             <FormInput
               label="First Name"
-              type="text"
               name="fname"
-              placeholder="Your first name"
-              value={editFormData.fname || ""}
+              value={editFormData.fname}
               onChange={handleChange}
-              className="w-full"
+              placeholder="Enter your first name"
+              required
             />
             <FormInput
               label="Last Name"
-              type="text"
               name="lname"
-              placeholder="Your last name"
-              value={editFormData.lname || ""}
+              value={editFormData.lname}
               onChange={handleChange}
-              className="w-full"
+              placeholder="Enter your last name"
+              required
             />
           </div>
 
-          {/* Phone */}
           <FormInput
             label="Phone Number"
-            type="tel"
             name="phone"
-            placeholder="01X XXXXXXX"
-            pattern="[0-9]{10,11}"
-            maxLength={11}
-            value={editFormData.phone || ""}
+            value={editFormData.phone}
             onChange={handleChange}
+            placeholder="Enter your phone number"
           />
 
-          {/* Address Fields */}
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">Street Address</span>
-            </label>
-            <input
-              name="address.street"
-              className="input input-bordered w-full"
-              placeholder="Street address"
-              value={editFormData.address?.street || ""}
-              onChange={handleAddressChange}
+          <h4 className="mt-4 font-semibold">Address Information</h4>
+          <FormInput
+            label="Street Address"
+            name="address.street"
+            value={editFormData.address.street}
+            onChange={handleChange}
+            placeholder="Enter your street address"
+          />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormInput
+              label="City"
+              name="address.city"
+              value={editFormData.address.city}
+              onChange={handleChange}
+              placeholder="Enter your city"
+            />
+            <FormInput
+              label="State/Province"
+              name="address.state"
+              value={editFormData.address.state}
+              onChange={handleChange}
+              placeholder="Enter your state"
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text font-medium">City</span>
-              </label>
-              <input
-                name="address.city"
-                className="input input-bordered w-full"
-                placeholder="City"
-                value={editFormData.address?.city || ""}
-                onChange={handleAddressChange}
-              />
-            </div>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text font-medium">State</span>
-              </label>
-              <input
-                name="address.state"
-                className="input input-bordered w-full"
-                placeholder="State"
-                value={editFormData.address?.state || ""}
-                onChange={handleAddressChange}
-              />
-            </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormInput
+              label="ZIP/Postal Code"
+              name="address.zipCode"
+              value={editFormData.address.zipCode}
+              onChange={handleChange}
+              placeholder="Enter your ZIP code"
+            />
+            <FormInput
+              label="Country"
+              name="address.country"
+              value={editFormData.address.country}
+              onChange={handleChange}
+              placeholder="Enter your country"
+            />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text font-medium">Zip Code</span>
-              </label>
-              <input
-                name="address.zipCode"
-                className="input input-bordered w-full"
-                placeholder="Zip Code"
-                value={editFormData.address?.zipCode || ""}
-                onChange={handleAddressChange}
-              />
-            </div>
-
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text font-medium">Country</span>
-              </label>
-              <select
-                name="address.country"
-                className="select select-bordered w-full"
-                value={editFormData.address?.country || "United States"}
-                onChange={handleAddressChange}
-              >
-                <option value="United States">United States</option>
-                <option value="Canada">Canada</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="Australia">Australia</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="modal-action">
-          <form method="dialog">
-            <Button variant="outline" className="mr-2" type="submit">
+          <div className="modal-action">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                document.getElementById("edit_profile_modal").close()
+              }
+            >
               Cancel
             </Button>
-            {loading ? (
-              <span className="loading loading-spinner loading-xl text-primary" />
-            ) : (
-              <Button variant="primary" onClick={handleSubmit} type="button">
-                Save Changes
-              </Button>
-            )}
-          </form>
-        </div>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </form>
       </div>
+      <form method="dialog" className="modal-backdrop">
+        <button>close</button>
+      </form>
     </dialog>
   );
 };

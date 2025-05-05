@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ResponsiveImage from "../../components/ui/ResponsiveImage";
 import { getComponentImage } from "../BuildPC/componentUtils";
+import { formatPrice } from "../../utils/constants";
 
 const ComponentList = ({ components, totalPrice, componentDisplayNames }) => {
   return (
@@ -42,21 +43,21 @@ const ComponentList = ({ components, totalPrice, componentDisplayNames }) => {
                   {product.onDiscount ? (
                     <div>
                       <span className="font-medium">
-                        ৳{product.discountPrice.toFixed(2)}
+                        {formatPrice(product.discountPrice, true)}
                       </span>
                       <span className="ml-1 text-xs line-through opacity-60">
-                        ৳{product.price.toFixed(2)}
+                        {formatPrice(product.price, true)}
                       </span>
                     </div>
                   ) : (
-                    <span>৳{product.price.toFixed(2)}</span>
+                    <span>{formatPrice(product.price, true)}</span>
                   )}
                 </td>
               </tr>
             ))}
             <tr className="font-semibold">
               <td colSpan={2}>Total</td>
-              <td className="text-right">৳{totalPrice.toFixed(2)}</td>
+              <td className="text-right">{formatPrice(totalPrice, true)}</td>
             </tr>
           </tbody>
         </table>

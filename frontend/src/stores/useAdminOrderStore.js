@@ -55,10 +55,19 @@ export const useAdminOrderStore = create((set) => ({
     set({ loading: true });
     try {
       toast.loading("Updating order status...", { id: "update-order" });
+
+      // Special handling for cancellation to show appropriate UI message
+      if (statusData.orderStatus === "cancelled") {
+        toast.loading("Cancelling order...", { id: "update-order" });
+      }
+
       const res = await axios.patch(
         `/orders/admin/${orderId}/status`,
         statusData,
       );
+
+      // Get the updated payment status from the response - this will include automatic refunds
+      const updatedPaymentStatus = res.data.paymentStatus;
 
       set((state) => ({
         allOrders: state.allOrders.map((order) =>
@@ -66,7 +75,11 @@ export const useAdminOrderStore = create((set) => ({
             ? {
                 ...order,
                 orderStatus: statusData.orderStatus,
-                paymentStatus: statusData.paymentStatus || order.paymentStatus,
+                // Use the payment status from response which might have been automatically changed by the backend
+                paymentStatus:
+                  statusData.paymentStatus ||
+                  updatedPaymentStatus ||
+                  order.paymentStatus,
               }
             : order,
         ),
@@ -74,9 +87,24 @@ export const useAdminOrderStore = create((set) => ({
         loading: false,
       }));
 
-      toast.success("Order status updated successfully!", {
-        id: "update-order",
-      });
+      // Show appropriate success message based on the action
+      if (
+        statusData.orderStatus === "cancelled" &&
+        updatedPaymentStatus === "refunded"
+      ) {
+        toast.success("Order cancelled and payment refunded successfully!", {
+          id: "update-order",
+        });
+      } else if (statusData.orderStatus === "cancelled") {
+        toast.success("Order cancelled successfully!", {
+          id: "update-order",
+        });
+      } else {
+        toast.success("Order status updated successfully!", {
+          id: "update-order",
+        });
+      }
+
       return res.data;
     } catch (error) {
       console.error("Error updating order status:", error);
