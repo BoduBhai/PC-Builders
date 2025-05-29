@@ -10,6 +10,10 @@ import {
   Cpu,
   Monitor,
   HardDrive,
+  Github,
+  Linkedin,
+  FacebookIcon,
+  MailOpen,
 } from "lucide-react";
 
 const Footer = () => {
@@ -30,44 +34,6 @@ const Footer = () => {
               Your one-stop shop for custom PC builds and high-quality
               components.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-primary opacity-75 transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook size={24} />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-primary opacity-75 transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter size={24} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-primary opacity-75 transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram size={24} />
-              </a>
-              <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-primary opacity-75 transition-colors"
-                aria-label="Youtube"
-              >
-                <YoutubeIcon size={24} />
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
@@ -103,9 +69,9 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="hover:text-primary opacity-75 transition-colors"
+                  className="hover:text-primary flex items-center opacity-75 transition-colors"
                 >
-                  Contact
+                  <MailOpen size={16} className="mr-2" /> Contact
                 </Link>
               </li>
             </ul>
@@ -176,20 +142,65 @@ const Footer = () => {
                 <span className="opacity-75">support@pcbuilders.com</span>
               </li>
             </ul>
-
-            <div className="mt-4 md:mt-6">
-              <h4 className="mb-1 text-xs font-semibold md:text-sm">
-                Business Hours
-              </h4>
-              <p className="text-xs opacity-75 md:text-sm">
-                Mon-Fri: 9AM-8PM | Sat: 10AM-6PM
-              </p>
-            </div>
           </div>
         </div>
 
         {/* Copyright */}
         <div className="border-primary/80 mt-4 border-t pt-4 text-center md:mt-8 md:pt-4">
+          <p className="text-md mb-2 tracking-wider md:text-lg">
+            Developed by{" "}
+            <a
+              href="https://www.linkedin.com/in/bodruddoza-araf-5989a22b7/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-violet-500 hover:underline"
+            >
+              Bodruddoza Araf
+            </a>
+            {"  "}
+            <a
+              href="https://github.com/BoduBhai/PC-Builders"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Github
+                size="24"
+                className="hover:text-primary inline opacity-75 transition-colors"
+              />
+            </a>
+            <a
+              href="https://www.facebook.com/bodruddoza.araf.2025/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Facebook
+                size="24"
+                className="hover:text-primary inline opacity-75 transition-colors"
+              />
+            </a>
+            {"  "}
+            <a
+              href="https://www.linkedin.com/in/bodruddoza-araf-5989a22b7/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Linkedin
+                size="24"
+                className="hover:text-primary inline opacity-75 transition-colors"
+              />
+            </a>
+            {"  "}
+            <a
+              href="https://www.instagram.com/_bodruddoza.araf_/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Instagram
+                size="24"
+                className="hover:text-primary inline opacity-75 transition-colors"
+              />
+            </a>
+          </p>
           <p className="text-xs opacity-50 md:text-sm">
             © {currentYear} PC Builders. All rights reserved.
           </p>
