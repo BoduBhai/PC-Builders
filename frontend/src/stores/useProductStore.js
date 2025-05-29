@@ -22,7 +22,6 @@ export const useProductStore = create((set, get) => ({
 
     set({ loading: true });
     try {
-      // First try to find the product in the existing products array
       let product = null;
       const state = get();
 
@@ -38,19 +37,16 @@ export const useProductStore = create((set, get) => ({
         product = state.discountedProducts.find((p) => p._id === productId);
       }
 
-      // If found in local state, use that to avoid an extra API call
       if (product) {
         set({ currentProduct: product, loading: false });
         return product;
       }
 
-      // If not found locally, fetch from API
       const res = await axios.get(`/products/${productId}`);
       set({ currentProduct: res.data, loading: false });
       return res.data;
     } catch (error) {
       set({ loading: false, currentProduct: null });
-      console.error("Error fetching product details:", error);
       toast.error(
         error?.response?.data?.message || "Failed to fetch product details",
       );
@@ -94,17 +90,14 @@ export const useProductStore = create((set, get) => ({
       set({ products: res.data.products, loading: false });
       return res.data.products;
     } catch (error) {
-      console.error("Error fetching products:", error);
       toast.error("Failed to fetch products. Try logging in again.");
       set({ error: "Failed to fetch products", loading: false });
       throw error;
     }
   },
-
   fetchDiscountedProducts: async (page = null, limit = null) => {
     set({ loading: true });
     try {
-      // If page is provided, we're using pagination; otherwise just get all discounted products
       if (page !== null) {
         const pageToFetch = page || 1;
         const limitToFetch = limit || 9;
@@ -122,14 +115,27 @@ export const useProductStore = create((set, get) => ({
         return res.data;
       } else {
         // Original behavior for the homepage preview
-        const res = await axios.get("/products/discounted-products");
-        set({ discountedProducts: res.data, loading: false });
-        return res.data;
+        try {
+          const res = await axios.get("/products/discounted-products");
+          set({ discountedProducts: res.data, loading: false });
+          return res.data;
+        } catch (error) {
+          // If 404 error (no discounted products found), set empty array instead of throwing
+          if (error.response && error.response.status === 404) {
+            set({ discountedProducts: [], loading: false });
+            return { products: [] };
+          }
+          throw error; // Re-throw other errors
+        }
       }
     } catch (error) {
-      console.error("Error fetching discounted products:", error);
-      toast.error("Failed to fetch discounted products. Try logging in again.");
       set({ error: "Failed to fetch discounted products", loading: false });
+
+      // Handle 404 error for pagination case as well
+      if (error.response && error.response.status === 404) {
+        set({ discountedProducts: [], loading: false });
+        return { products: [] };
+      }
       throw error;
     }
   },
@@ -141,7 +147,6 @@ export const useProductStore = create((set, get) => ({
       set({ products: res.data.products, loading: false });
       return res.data.products;
     } catch (error) {
-      console.error(`Error fetching ${category} products:`, error);
       set({ error: `Failed to fetch ${category} products`, loading: false });
       throw error;
     }

@@ -100,7 +100,6 @@ const CreateProductForm = () => {
       });
       setErrors({});
     } catch (error) {
-      console.error("Error creating product:", error);
       setSubmitFeedback({
         type: "error",
         message: error?.response?.data?.message || "Failed to create product",

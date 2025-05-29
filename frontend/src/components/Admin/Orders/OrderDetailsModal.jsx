@@ -27,9 +27,6 @@ const PrintIcon = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-/**
- * Modal component for displaying order details
- */
 const OrderDetailsModal = ({
   order,
   closeModal,
@@ -45,10 +42,8 @@ const OrderDetailsModal = ({
   const [updatedOrder, setUpdatedOrder] = useState(null);
   const [timelineKey, setTimelineKey] = useState(Date.now());
 
-  // Use the updated order if available, otherwise use the original order
   const displayOrder = updatedOrder || order;
 
-  // Reset state when a new order is selected
   useEffect(() => {
     if (order) {
       setUpdatedOrder(order);
@@ -56,15 +51,13 @@ const OrderDetailsModal = ({
     }
   }, [order]);
 
-  // Custom handlers to update statuses and trigger timeline refresh
   const handleOrderStatusUpdate = async (orderId, status) => {
     try {
-      setPaymentDetails(null); // Clear existing data to show loading state
+      setPaymentDetails(null);
       await handleUpdateOrderStatus(orderId, status);
-      // Force a refresh of the timeline after status update
       const details = await getOrderPaymentDetails(orderId);
       setPaymentDetails(details);
-      setTimelineKey(Date.now()); // Force re-render of timeline section
+      setTimelineKey(Date.now());
     } catch (error) {
       console.error("Failed to update order status:", error);
     }
@@ -72,12 +65,11 @@ const OrderDetailsModal = ({
 
   const handlePaymentStatusUpdate = async (orderId, status) => {
     try {
-      setPaymentDetails(null); // Clear existing data to show loading state
+      setPaymentDetails(null);
       await handleUpdatePaymentStatus(orderId, status);
-      // Force a refresh of the timeline after status update
       const details = await getOrderPaymentDetails(orderId);
       setPaymentDetails(details);
-      setTimelineKey(Date.now()); // Force re-render of timeline section
+      setTimelineKey(Date.now());
     } catch (error) {
       console.error("Failed to update payment status:", error);
     }

@@ -71,7 +71,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <main className="container mx-auto">
+    <main className="container mx-auto min-h-[80vh]">
       <header>
         <h1 className="text-primary mb-4 text-center text-3xl font-bold">
           Welcome,{" "}

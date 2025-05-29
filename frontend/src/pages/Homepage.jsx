@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
@@ -8,7 +8,7 @@ import { useProductStore } from "../stores/useProductStore";
 
 import { featuredCategories } from "../utils/constants";
 import { ProductCardSkeleton } from "../components/Skeletons/ProductCardSkeleton";
-const ProductCard = lazy(() => import("../components/ui/ProductCard"));
+import ProductCard from "../components/ui/ProductCard";
 
 const HomePage = () => {
   const MAX_HOMEPAGE_PRODUCTS = 6;
@@ -26,9 +26,9 @@ const HomePage = () => {
   useEffect(() => {
     fetchDiscountedProducts();
   }, [fetchDiscountedProducts]);
-
   // Only display up to MAX_HOMEPAGE_PRODUCTS
-  const visibleProducts = discountedProducts?.slice(0, MAX_HOMEPAGE_PRODUCTS);
+  const visibleProducts =
+    discountedProducts?.slice(0, MAX_HOMEPAGE_PRODUCTS) || [];
   const hasMoreProducts = discountedProducts?.length > MAX_HOMEPAGE_PRODUCTS;
 
   return (
@@ -201,68 +201,77 @@ const HomePage = () => {
       </section>
 
       {/* Discounted Products Section */}
-      <section
-        className="bg-base-200 py-16"
-        aria-labelledby="special-offers-heading"
-      >
-        <div className="container mx-auto px-4">
-          <h2
-            id="special-offers-heading"
-            className="mb-6 text-center text-3xl font-bold"
-          >
-            Special Offers
-          </h2>
-          <p className="mb-8 text-center text-lg">
-            Limited time discounts on our best PC components!
-          </p>
+      {visibleProducts.length === 0 ? (
+        <section className="bg-base-200 py-16">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="mb-4 text-3xl font-bold">No Special Offers</h2>
+            <p className="text-primary/80 text-lg">
+              Check back soon for our latest discounts!
+            </p>
+          </div>
+        </section>
+      ) : (
+        <section
+          className="bg-base-200 py-16"
+          aria-labelledby="special-offers-heading"
+        >
+          <div className="container mx-auto px-4">
+            <h2
+              id="special-offers-heading"
+              className="mb-6 text-center text-3xl font-bold"
+            >
+              Special Offers
+            </h2>
+            <p className="mb-8 text-center text-lg">
+              Limited time discounts on our best PC components!
+            </p>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {loading ? (
-              // Show skeletons when loading
-              Array(6)
-                .fill()
-                .map((_, index) => <ProductCardSkeleton key={index} />)
-            ) : visibleProducts && visibleProducts.length > 0 ? (
-              visibleProducts.map((product) => (
-                <Suspense key={product._id} fallback={<ProductCardSkeleton />}>
-                  <ProductCard product={product} />
-                </Suspense>
-              ))
-            ) : (
-              <div className="col-span-3 py-12 text-center">
-                <h3 className="text-xl">No discounted products found</h3>
-                <p className="mt-2 text-gray-500">
-                  Check back soon for our newest offers!
-                </p>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {loading ? (
+                // Show skeletons when loading
+                Array(6)
+                  .fill()
+                  .map((_, index) => <ProductCardSkeleton key={index} />)
+              ) : visibleProducts && visibleProducts.length > 0 ? (
+                visibleProducts.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))
+              ) : (
+                <div className="col-span-3 py-12 text-center">
+                  <h3 className="text-xl">No discounted products found</h3>
+                  <p className="mt-2 text-gray-500">
+                    Check back soon for our newest offers!
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Link to view all discounted products when there are more */}
+            {hasMoreProducts && (
+              <div className="mt-12 flex justify-center">
+                <Link
+                  to="/discounted-products"
+                  className="btn btn-primary btn-wide"
+                >
+                  View All Discounted Products
+                </Link>
               </div>
             )}
-          </div>
 
-          {/* Link to view all discounted products when there are more */}
-          {hasMoreProducts && (
-            <div className="mt-12 flex justify-center">
+            <aside className="mx-auto mt-4 flex flex-col items-center justify-center gap-1 text-center">
+              <p className="text-lg font-medium tracking-widest">
+                Can't find what you're looking for?
+              </p>
               <Link
-                to="/discounted-products"
-                className="btn btn-primary btn-wide"
+                to="/products"
+                className="text-primary text-md flex items-center gap-2 transition-all hover:scale-105 hover:transform"
               >
-                View All Discounted Products
+                Browse All Products <ArrowRight className="h-5 w-5" />
               </Link>
-            </div>
-          )}
-
-          <aside className="mx-auto mt-4 flex flex-col items-center justify-center gap-1 text-center">
-            <p className="text-lg font-medium tracking-widest">
-              Can't find what you're looking for?
-            </p>
-            <Link
-              to="/products"
-              className="text-primary text-md flex items-center gap-2 transition-all hover:scale-105 hover:transform"
-            >
-              Browse All Products <ArrowRight className="h-5 w-5" />
-            </Link>
-          </aside>
-        </div>
-      </section>
+            </aside>
+          </div>
+        </section>
+      )}
     </main>
   );
 };

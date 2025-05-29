@@ -1,8 +1,6 @@
-import { lazy, Suspense } from "react";
 import { CartIcon } from "../icons";
 import { ProductCardSkeleton } from ".././Skeletons/ProductCardSkeleton";
-
-const ProductCard = lazy(() => import("./ProductCard"));
+import ProductCard from "./ProductCard";
 
 const ProductGrid = ({
   products = [],
@@ -30,9 +28,7 @@ const ProductGrid = ({
       ) : products && products.length > 0 ? (
         <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (
-            <Suspense key={product._id} fallback={<ProductCardSkeleton />}>
-              <ProductCard product={product} />
-            </Suspense>
+            <ProductCard key={product._id} product={product} />
           ))}
         </section>
       ) : (

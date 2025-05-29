@@ -59,7 +59,6 @@ export const useUserStore = create((set, get) => ({
       toast.error(error.response.data.message || "Something went wrong!");
     }
   },
-
   checkAuth: async () => {
     set({ checkingAuth: true });
 
@@ -67,8 +66,12 @@ export const useUserStore = create((set, get) => ({
       const res = await axios.get("/auth/profile");
       set({ user: res.data, checkingAuth: false });
     } catch (error) {
+      // Silent fail for auth check - this is expected when not logged in
       set({ user: null, checkingAuth: false });
-      console.log("Error checking auth:", error.message);
+      // Only log actual unexpected errors, not 401s
+      if (error.response?.status !== 401) {
+        console.error("Unexpected error checking auth:", error);
+      }
     }
   },
 
@@ -127,7 +130,17 @@ axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip token refresh for auth endpoints to prevent endless loops
+    const isAuthEndpoint =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/profile") ||
+      originalRequest.url?.includes("/auth/refresh-token");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
       originalRequest._retry = true;
 
       try {

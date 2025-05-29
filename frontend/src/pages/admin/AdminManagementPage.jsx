@@ -6,16 +6,14 @@ import {
   LayoutDashboard,
   BarChart4,
 } from "lucide-react";
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-// Lazy loaded components
-const CreateProductForm = lazy(
-  () => import("../../components/CreateProductForm"),
-);
-const ProductsList = lazy(() => import("../../components/ProductsList"));
-const UsersList = lazy(() => import("../../components/UsersList"));
-const AdminOrdersPage = lazy(() => import("./AdminOrdersPage"));
+// Direct imports instead of lazy loading
+import CreateProductForm from "../../components/CreateProductForm";
+import ProductsList from "../../components/ProductsList";
+import UsersList from "../../components/UsersList";
+import AdminOrdersPage from "./AdminOrdersPage";
 
 import { useProductStore } from "../../stores/useProductStore";
 import { useAdminStore } from "../../stores/useAdminStore";
@@ -47,6 +45,7 @@ const tabs = [
 
 const AdminManagementPage = () => {
   const [activeTab, setActiveTab] = useState("create");
+  const [loading, setLoading] = useState(false);
 
   const { getAllUsers } = useAdminStore();
   const { fetchProducts } = useProductStore();
@@ -54,13 +53,22 @@ const AdminManagementPage = () => {
 
   useEffect(() => {
     // Load data based on active tab
-    if (activeTab === "products") {
-      fetchProducts();
-    } else if (activeTab === "users") {
-      getAllUsers();
-    } else if (activeTab === "orders") {
-      fetchAllOrders();
-    }
+    setLoading(true);
+    const loadData = async () => {
+      try {
+        if (activeTab === "products") {
+          await fetchProducts();
+        } else if (activeTab === "users") {
+          await getAllUsers();
+        } else if (activeTab === "orders") {
+          await fetchAllOrders();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, [activeTab, fetchProducts, getAllUsers, fetchAllOrders]);
 
   return (
@@ -87,7 +95,7 @@ const AdminManagementPage = () => {
           </div>
         </div>
 
-        {/* Improved Tabs Section */}
+        {/* Navigation Tabs */}
         <div className="flex justify-center">
           <div className="tabs-boxed bg-base-300 rounded-box flex w-full flex-wrap justify-evenly gap-1 p-2 shadow-md md:gap-2">
             {tabs.map((tab) => (
@@ -114,12 +122,16 @@ const AdminManagementPage = () => {
 
         <div className="card bg-base-300 my-8 rounded-lg shadow-lg">
           <div className="card-body">
-            <Suspense fallback={<LoadingSpinner size="lg" />}>
-              {activeTab === "create" && <CreateProductForm />}
-              {activeTab === "products" && <ProductsList />}
-              {activeTab === "orders" && <AdminOrdersPage />}
-              {activeTab === "users" && <UsersList />}
-            </Suspense>
+            {loading ? (
+              <LoadingSpinner size="lg" />
+            ) : (
+              <>
+                {activeTab === "create" && <CreateProductForm />}
+                {activeTab === "products" && <ProductsList />}
+                {activeTab === "orders" && <AdminOrdersPage />}
+                {activeTab === "users" && <UsersList />}
+              </>
+            )}
           </div>
         </div>
       </div>

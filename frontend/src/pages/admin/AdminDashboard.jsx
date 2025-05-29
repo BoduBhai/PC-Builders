@@ -1,9 +1,9 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect } from "react";
 import { BarChart4, LayoutDashboard, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Lazy loaded dashboard component
-const Analytics = lazy(() => import("../../components/Analytics"));
+// Direct import instead of lazy loading
+import Analytics from "../../components/Analytics";
 
 import { useAnalyticsStore } from "../../stores/useAnalyticsStore";
 
@@ -35,15 +35,7 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4">
         <div className="bg-base-100 rounded-lg shadow-lg">
-          <Suspense
-            fallback={
-              <div className="flex justify-center">
-                <div className="loading loading-spinner loading-lg"></div>
-              </div>
-            }
-          >
-            <Analytics />
-          </Suspense>
+          <Analytics />
         </div>
       </div>
     </div>

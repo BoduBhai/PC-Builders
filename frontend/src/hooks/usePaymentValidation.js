@@ -152,6 +152,7 @@ const usePaymentValidation = () => {
 
     if (!bankData.accountName.trim()) {
       errors.accountName = "Account name is required";
+      // eslint-disable-next-line no-useless-escape
     } else if (!/^[A-Za-z\s\.]+$/.test(bankData.accountName)) {
       errors.accountName =
         "Account name should contain only letters, spaces, and periods";
@@ -268,14 +269,6 @@ const usePaymentValidation = () => {
             ...prev,
             transactionId: response.transactionId,
           }));
-
-          // Log masked card data for security
-          const maskedCardData = {
-            ...cardData,
-            cardNumber: `**** **** **** ${cardData.cardNumber.slice(-4)}`,
-            cvv: "***",
-          };
-          console.log("Card details validated:", maskedCardData);
         } else {
           setPaymentProcessingError(
             response.message || "Card verification failed",

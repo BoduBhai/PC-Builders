@@ -1,5 +1,6 @@
 import React from "react";
 import { Settings, Cpu } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const CustomBudgetForm = ({
   customBudget,
@@ -45,29 +46,33 @@ const CustomBudgetForm = ({
               Range starts from ৳{MIN_BUDGET.toLocaleString()}
             </span>
           </label>
-
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-grow">
               <div className="join w-full">
                 <span className="btn btn-neutral join-item no-animation">
                   ৳
-                </span>
+                </span>{" "}
                 <input
                   type="number"
-                  min={MIN_BUDGET}
                   step="50"
                   value={customBudget}
                   onChange={(e) =>
-                    setCustomBudget(
-                      Math.max(MIN_BUDGET, parseInt(e.target.value) || 0),
-                    )
+                    setCustomBudget(parseInt(e.target.value) || 0)
                   }
                   className="join-item input input-bordered w-full"
                   placeholder="Enter amount in taka"
-                />
+                />{" "}
                 <button
                   className="btn btn-primary join-item"
-                  onClick={generateCustomConfiguration}
+                  onClick={() => {
+                    if (customBudget < MIN_BUDGET) {
+                      toast.error(
+                        `Budget should be at least ৳${MIN_BUDGET.toLocaleString()}`,
+                      );
+                      return;
+                    }
+                    generateCustomConfiguration();
+                  }}
                   disabled={isGeneratingCustomBuild}
                 >
                   {isGeneratingCustomBuild ? (
@@ -80,7 +85,6 @@ const CustomBudgetForm = ({
               </div>
             </div>
           </div>
-
           <div className="mt-4">
             <div className="alert bg-base-300/50 text-sm shadow-sm">
               <div>
@@ -100,22 +104,7 @@ const CustomBudgetForm = ({
                   </li>
                 </ul>
               </div>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <div className="bg-base-300 h-2.5 w-full rounded-full">
-              <div
-                className="bg-primary h-2.5 rounded-full"
-                style={{
-                  width: `${Math.min(100, (customBudget / MAX_BUDGET) * 100)}%`,
-                }}
-              ></div>
-            </div>
-            <div className="mt-1 flex justify-between text-xs">
-              <span>৳{MIN_BUDGET.toLocaleString()}</span>
-              <span>৳{MAX_BUDGET.toLocaleString()}</span>
-            </div>
+            </div>{" "}
           </div>
         </div>
       </div>

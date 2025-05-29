@@ -14,7 +14,10 @@ export const brandOptions = [
   "Dell",
   "EVGA",
   "Fantech",
+  "Gamdias",
   "Gigabyte",
+  "G Skill",
+  "Havit",
   "HP",
   "Intel",
   "Kingston",
@@ -27,7 +30,10 @@ export const brandOptions = [
   "NZXT",
   "NVIDIA",
   "PNY",
+  "OCPC",
   "Razer",
+  "Redragon",
+  "Revenger",
   "Samsung",
   "Sapphire",
   "Seagate",
@@ -36,6 +42,8 @@ export const brandOptions = [
   "Thermaltake",
   "Toshiba",
   "Western Digital",
+  "Xbox",
+  "Xigmatek",
   "ZOTAC",
   "1stPlayer",
 ];
@@ -146,12 +154,6 @@ export const featuredCategories = [
   },
 ];
 
-/**
- * Format price with locale-specific formatting and currency symbol
- * @param {number} price - The price to format
- * @param {boolean} showDecimals - Whether to show decimal places (default: false)
- * @returns {string} Formatted price with currency symbol
- */
 export const formatPrice = (price, showDecimals = false) => {
   if (price === undefined || price === null) return "৳0";
 

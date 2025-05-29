@@ -26,11 +26,11 @@ const DiscountedProductsPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(8);
   const [sortOption, setSortOption] = useState("default");
   const [showScrollTop, setShowScrollTop] = useState(false);
-
-  // Fetch all discounted products at once for client-side filtering
+  // Fetch discounted products with pagination
   useEffect(() => {
-    fetchDiscountedProducts();
-  }, [fetchDiscountedProducts]);
+    // Use pagination parameters to avoid 404 errors when no products are found
+    fetchDiscountedProducts(currentPage, itemsPerPage);
+  }, [fetchDiscountedProducts, currentPage, itemsPerPage]);
 
   // Monitor scroll position for the scroll-to-top button
   useEffect(() => {
@@ -51,9 +51,8 @@ const DiscountedProductsPage = () => {
       setSearchTerm(searchParam);
     }
   }, [categoryParam, searchParam]);
-
   // Filter products based on search term, category, brand, and price range
-  const filteredProducts = discountedProducts?.filter((product) => {
+  const filteredProducts = (discountedProducts || []).filter((product) => {
     // Search term filter
     const searchMatch =
       searchTerm === "" ||
@@ -82,9 +81,8 @@ const DiscountedProductsPage = () => {
 
     return searchMatch && categoryMatch && brandMatch && priceMatch;
   });
-
   // Sort products based on selected option
-  const sortedProducts = filteredProducts?.slice().sort((a, b) => {
+  const sortedProducts = (filteredProducts || []).slice().sort((a, b) => {
     switch (sortOption) {
       case "price_low":
         return a.discountPrice - b.discountPrice;
@@ -105,14 +103,11 @@ const DiscountedProductsPage = () => {
   // Calculate pagination values
   const totalFilteredProducts = filteredProducts?.length || 0;
   const totalPages = Math.ceil(totalFilteredProducts / itemsPerPage);
-
   // Get current page's products
   const indexOfLastProduct = currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = sortedProducts?.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct,
-  );
+  const currentProducts =
+    sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct) || [];
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

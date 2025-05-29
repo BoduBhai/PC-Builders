@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, lazy, Suspense } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,9 +17,8 @@ import { useCartStore } from "../../stores/useCartStore";
 import { formatDate } from "../../utils/dateUtils";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
-// Lazy load ProductCard component
-const ProductCard = lazy(() => import("../../components/ui/ProductCard"));
-
+// Direct import instead of lazy loading
+import ProductCard from "../../components/ui/ProductCard";
 import { ProductCardSkeleton } from "../../components/Skeletons/ProductCardSkeleton";
 
 const ProductDetailsPage = () => {
@@ -557,9 +556,7 @@ const ProductDetailsPage = () => {
                   className={`w-full flex-shrink-0 flex-grow-0 sm:w-1/2 lg:w-1/4`}
                   style={{ maxWidth: `calc(100% / ${visibleSlides})` }}
                 >
-                  <Suspense fallback={<ProductCardSkeleton />}>
-                    <ProductCard product={product} />
-                  </Suspense>
+                  <ProductCard product={product} />
                 </div>
               ))}
             </div>

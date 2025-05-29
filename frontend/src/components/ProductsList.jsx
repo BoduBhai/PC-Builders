@@ -17,7 +17,9 @@ const ProductsList = () => {
     loading,
   } = useProductStore();
 
+  // eslint-disable-next-line no-unused-vars
   const [editProductData, setEditProductData] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [discountProductData, setDiscountProductData] = useState(null);
   const [productToDelete, setProductToDelete] = useState(null);
 
@@ -36,7 +38,6 @@ const ProductsList = () => {
       const errorMsg =
         error?.response?.data?.message || "Failed to update product";
       toast.error(errorMsg);
-      console.error("Product update error:", error);
     }
   };
 
@@ -59,7 +60,6 @@ const ProductsList = () => {
       const errorMsg =
         error?.response?.data?.message || "Failed to update discount";
       toast.error(errorMsg);
-      console.error("Discount update error:", error);
     }
   };
 
@@ -80,7 +80,6 @@ const ProductsList = () => {
       const errorMsg =
         error?.response?.data?.message || "Failed to delete product";
       toast.error(errorMsg);
-      console.error("Product deletion error:", error);
     }
   };
 
